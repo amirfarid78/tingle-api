@@ -1,0 +1,56 @@
+<%- include('partials/header', { pageTitle: 'Support' , page: 'help' }) %>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Complaint</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Admin Response</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% tickets.forEach(function(t) { %>
+                <tr>
+                    <td>
+                        <%= t.userId ? t.userId.name : 'Unknown' %>
+                    </td>
+                    <td style="max-width:200px">
+                        <%= t.complaint %>
+                    </td>
+                    <td>
+                        <%= t.contact %>
+                    </td>
+                    <td>
+                        <span
+                            class="badge <%= t.status === 0 ? 'badge-yellow' : t.status === 2 ? 'badge-green' : t.status === 3 ? 'badge-red' : 'badge-blue' %>">
+                            <%= ['Submitted','In Progress','Resolved','Closed'][t.status] %>
+                        </span>
+                    </td>
+                    <td style="max-width:150px">
+                        <%= t.adminResponse || '-' %>
+                    </td>
+                    <td>
+                        <%= new Date(t.createdAt).toLocaleDateString() %>
+                    </td>
+                    <td>
+                        <form method="POST" action="/admin/help/<%= t._id %>/respond"
+                            style="display:flex;gap:4px;flex-wrap:wrap">
+                            <input name="response" placeholder="Response..."
+                                style="padding:4px 8px;background:#252540;border:1px solid #2a2a3e;border-radius:4px;color:#e0e0e8;font-size:12px;width:120px">
+                            <select name="status"
+                                style="padding:4px;background:#252540;border:1px solid #2a2a3e;border-radius:4px;color:#e0e0e8;font-size:12px">
+                                <option value="1">In Progress</option>
+                                <option value="2">Resolved</option>
+                                <option value="3">Closed</option>
+                            </select>
+                            <button class="btn btn-primary">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+    <%- include('partials/footer') %>

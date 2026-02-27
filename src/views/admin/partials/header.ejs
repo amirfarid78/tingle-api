@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tingle Admin — <%= typeof pageTitle !=='undefined' ? pageTitle : 'Dashboard' %>
+    </title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/logo.png" alt="Logo"
+                onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCBmaWxsPSIjODFkNGZhIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIvPjwvc3ZnPg=='">
+            Tingle
+        </div>
+
+        <a href="/admin" class="nav-item <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>">
+            <span class="icon">📊</span> Dashboard
+        </a>
+
+        <div class="section-label">User Management</div>
+        <a href="/admin/users" class="nav-item <%= typeof page !== 'undefined' && page === 'users' ? 'active' : '' %>">
+            <span class="icon">👥</span> User
+        </a>
+        <a href="/admin/help" class="nav-item <%= typeof page !== 'undefined' && page === 'help' ? 'active' : '' %>">
+            <span class="icon">🎧</span> User Verification
+        </a>
+        <a href="/admin/agencies"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'agencies' ? 'active' : '' %>">
+            <span class="icon">🏢</span> Agency
+        </a>
+        <a href="/admin/users" class="nav-item">
+            <span class="icon">🎓</span> Host Application
+        </a>
+        <a href="/admin/hosts" class="nav-item <%= typeof page !== 'undefined' && page === 'hosts' ? 'active' : '' %>">
+            <span class="icon">🎙️</span> Host
+        </a>
+        <a href="/admin/users" class="nav-item">
+            <span class="icon">🪙</span> Coin Trader
+        </a>
+
+        <div class="section-label">Banner</div>
+        <a href="/admin/settings" class="nav-item">
+            <span class="icon">📱</span> Splash
+        </a>
+        <a href="/admin/settings" class="nav-item">
+            <span class="icon">🏠</span> Home
+        </a>
+        <a href="/admin/gifts" class="nav-item <%= typeof page !== 'undefined' && page === 'gifts' ? 'active' : '' %>">
+            <span class="icon">🎁</span> Gift
+        </a>
+        <a href="/admin/store" class="nav-item <%= typeof page !== 'undefined' && page === 'store' ? 'active' : '' %>">
+            <span class="icon">🎮</span> Game
+        </a>
+
+        <div class="section-label">Content</div>
+        <a href="/admin/posts" class="nav-item <%= typeof page !== 'undefined' && page === 'posts' ? 'active' : '' %>">
+            <span class="icon">📝</span> Posts
+        </a>
+        <a href="/admin/videos"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'videos' ? 'active' : '' %>">
+            <span class="icon">🎬</span> Videos
+        </a>
+        <a href="/admin/live" class="nav-item <%= typeof page !== 'undefined' && page === 'live' ? 'active' : '' %>">
+            <span class="icon">🔴</span> Live Rooms
+        </a>
+        <a href="/admin/songs" class="nav-item <%= typeof page !== 'undefined' && page === 'songs' ? 'active' : '' %>">
+            <span class="icon">🎵</span> Songs
+        </a>
+        <a href="/admin/hashtags"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'hashtags' ? 'active' : '' %>">
+            <span class="icon">#️⃣</span> Hashtags
+        </a>
+
+        <div class="section-label">Monetization</div>
+        <a href="/admin/vip-plans"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'vip-plans' ? 'active' : '' %>">
+            <span class="icon">💎</span> VIP Plans
+        </a>
+        <a href="/admin/coin-plans"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'coinPlans' ? 'active' : '' %>">
+            <span class="icon">💰</span> Coin Plans
+        </a>
+        <a href="/admin/store" class="nav-item">
+            <span class="icon">🏪</span> Store
+        </a>
+
+        <div class="section-label">System</div>
+        <a href="/admin/reports"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'reports' ? 'active' : '' %>">
+            <span class="icon">🚩</span> Reports
+        </a>
+        <a href="/admin/report-reasons" class="nav-item">
+            <span class="icon">📋</span> Report Reasons
+        </a>
+        <a href="/admin/settings"
+            class="nav-item <%= typeof page !== 'undefined' && page === 'settings' ? 'active' : '' %>">
+            <span class="icon">⚙️</span> Settings
+        </a>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="search-container">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" placeholder="Search dashboard...">
+            </div>
+            <div class="actions">
+                <button class="icon-btn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                        </path>
+                    </svg>
+                </button>
+                <button class="icon-btn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                </button>
+                <div class="profile-btn">
+                    <img src="/logo.png"
+                        onerror="this.src='https://ui-avatars.com/api/?name=Admin&background=818cf8&color=fff'"
+                        alt="Admin">
+                </div>
+            </div>
+        </div>
+        <div class="content">

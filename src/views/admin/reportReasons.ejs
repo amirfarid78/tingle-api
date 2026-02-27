@@ -1,0 +1,38 @@
+<%- include('partials/header', { pageTitle: 'Report Reasons' , page: 'reportReasons' }) %>
+    <div class="card">
+        <h3>Add Report Reason</h3>
+        <form method="POST" action="/admin/report-reasons/create" class="form-inline">
+            <div class="form-group"><label>Title</label><input name="title" required></div>
+            <div class="form-group"><label>Description</label><input name="description"
+                    placeholder="Optional description"></div>
+            <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% reasons.forEach(function(r) { %>
+                <tr>
+                    <td>
+                        <%= r.title %>
+                    </td>
+                    <td>
+                        <%= r.description || '-' %>
+                    </td>
+                    <td>
+                        <form method="POST" action="/admin/report-reasons/<%= r._id %>/delete"
+                            onsubmit="return confirm('Delete?')">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+    <%- include('partials/footer') %>

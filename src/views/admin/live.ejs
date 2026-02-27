@@ -1,0 +1,57 @@
+<%- include('partials/header', { pageTitle: 'Live Rooms' , page: 'live' }) %>
+    <table>
+        <thead>
+            <tr>
+                <th>Host</th>
+                <th>Room Name</th>
+                <th>Type</th>
+                <th>Viewers</th>
+                <th>Coins Earned</th>
+                <th>Started</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(rooms.length> 0) { %>
+                <% rooms.forEach(function(r) { %>
+                    <tr>
+                        <td style="display:flex;align-items:center;gap:8px">
+                            <img class="avatar" src="<%= r.userId?.image || '' %>" onerror="this.style.display='none'">
+                            <%= r.userId?.name || 'Unknown' %>
+                        </td>
+                        <td>
+                            <%= r.roomName || r.channel || '-' %>
+                        </td>
+                        <td>
+                            <span class="badge badge-blue">
+                                <%= ['', 'Live' , 'Audio' , 'PK' ][r.liveType] || 'Live' %>
+                            </span>
+                            <% if(r.isPkMode) { %> <span class="badge badge-red">PK</span>
+                                <% } %>
+                        </td>
+                        <td>
+                            <%= r.view || 0 %>
+                        </td>
+                        <td>
+                            <%= r.totalCoinsEarned || 0 %>
+                        </td>
+                        <td>
+                            <%= new Date(r.startedAt || r.createdAt).toLocaleString() %>
+                        </td>
+                        <td>
+                            <form method="POST" action="/admin/live/<%= r._id %>/end"
+                                onsubmit="return confirm('End this live session?')">
+                                <button class="btn btn-danger">End Stream</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" style="text-align:center;color:#8888a4;padding:40px">No active live
+                                    rooms</td>
+                            </tr>
+                            <% } %>
+        </tbody>
+    </table>
+    <%- include('partials/footer') %>

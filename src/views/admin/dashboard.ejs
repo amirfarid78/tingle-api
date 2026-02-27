@@ -1,0 +1,383 @@
+<%- include('partials/header', { pageTitle: 'Dashboard' , page: 'dashboard' }) %>
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Overview of platform activity and insights</p>
+        </div>
+        <button class="filter-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                </path>
+            </svg>
+            Filter by Date
+        </button>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="left-column">
+            <!-- Stats Grid -->
+            <div class="card">
+                <h3>Statistics</h3>
+                <div class="stat-grid">
+                    <!-- Row 1 -->
+                    <div class="stat-item">
+                        <div class="stat-icon icon-purple">👥</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= totalUsers %>
+                            </div>
+                            <div class="label">Total Users</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-blue">👑</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= vipUsers %>
+                            </div>
+                            <div class="label">VIP Users</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-orange">⚠️</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= reportedUsers %>
+                            </div>
+                            <div class="label">Reported Users</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-grey">🚫</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= blockedUsers %>
+                            </div>
+                            <div class="label">Blocked Users</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="stat-item">
+                        <div class="stat-icon icon-purple">🎙️</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= totalHosts %>
+                            </div>
+                            <div class="label">Total Hosts</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-grey">🚫</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= blockedHosts %>
+                            </div>
+                            <div class="label">Blocked Hosts</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-green">🏢</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= totalAgencies %>
+                            </div>
+                            <div class="label">Total Agencies</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-red">🚫</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= blockedAgencies %>
+                            </div>
+                            <div class="label">Blocked Agencies</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="stat-item">
+                        <div class="stat-icon icon-red">🖼️</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= totalPosts %>
+                            </div>
+                            <div class="label">Total Posts</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-green">🎬</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= totalVideos %>
+                            </div>
+                            <div class="label">Total Videos</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-orange">⚠️</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= reportedPosts %>
+                            </div>
+                            <div class="label">Reported Posts</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon icon-orange">⚠️</div>
+                        <div class="stat-info">
+                            <div class="value">
+                                <%= reportedVideos %>
+                            </div>
+                            <div class="label">Reported Videos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Overview -->
+            <div class="card">
+                <h3>Activity Overview</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: -12px; margin-bottom: 20px;">Combined
+                    view of users, posts, videos, and reports activity</p>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Earning Hosts -->
+            <div class="card">
+                <h3>Top Earning Hosts</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: -12px; margin-bottom: 20px;">Based on
+                    total coins earned</p>
+                <div class="user-list">
+                    <% topEarningHosts.forEach(function(u) { %>
+                        <div class="user-item">
+                            <div class="user-item-left">
+                                <img src="<%= u.image || 'https://ui-avatars.com/api/?name=Host&background=random' %>"
+                                    onerror="this.src='https://ui-avatars.com/api/?name=Host&background=random'">
+                                <div class="user-item-info">
+                                    <h4>
+                                        <%= u.name || 'N/A' %> <span style="color: #3b82f6;">💙</span>
+                                    </h4>
+                                    <p>
+                                        <%= u.userName || '-' %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="user-item-right">
+                                <span class="coins">⭐ <%= u.coin || 0 %> Coins</span>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+
+            <!-- Top Performing Agencies -->
+            <div class="card">
+                <h3>Top Performing Agencies</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: -12px; margin-bottom: 20px;">Based on
+                    total earnings</p>
+                <div class="user-list">
+                    <% topPerformingAgencies.forEach(function(a) { %>
+                        <div class="user-item">
+                            <div class="user-item-left">
+                                <img src="<%= a.image || 'https://ui-avatars.com/api/?name=Agency&background=random' %>"
+                                    onerror="this.src='https://ui-avatars.com/api/?name=Agency&background=random'">
+                                <div class="user-item-info">
+                                    <h4>
+                                        <%= a.name %>
+                                    </h4>
+                                    <p>
+                                        <%= a.userName %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="user-item-right">
+                                <span class="coins">⭐ <%= a.coins %> Coins</span><br>
+                                <span style="font-size:12px;">
+                                    <%= a.hosts %> Hosts | <%= a.commission %> Commission
+                                </span>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <!-- Top Contributors -->
+            <div class="card">
+                <h3>Top Contributors</h3>
+                <div class="user-list">
+                    <% topContributors.forEach(function(u) { %>
+                        <div class="user-item">
+                            <div class="user-item-left">
+                                <img src="<%= u.image || 'https://ui-avatars.com/api/?name=User&background=random' %>"
+                                    onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                                <div class="user-item-info">
+                                    <h4>
+                                        <%= u.name || 'N/A' %>
+                                    </h4>
+                                    <p>
+                                        <%= u.userName || '-' %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="user-item-right">
+                                <span class="coins">⭐ <%= u.coin || 0 %> <br><span
+                                            style="font-weight:normal; font-size:11px;">coins</span></span>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+
+            <!-- Recent Users -->
+            <div class="card">
+                <h3>Recent Users</h3>
+                <div class="user-list">
+                    <% recentUsers.forEach(function(u) { %>
+                        <div class="user-item">
+                            <div class="user-item-left">
+                                <img src="<%= u.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name || 'User')+'&background=random' %>"
+                                    onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(u.name || 'User')+'&background=random'">
+                                <div class="user-item-info">
+                                    <h4>
+                                        <%= u.name || 'N/A' %>
+                                    </h4>
+                                    <p>
+                                        <%= u.userName || '-' %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="user-item-right">
+                                <p style="margin-bottom: 4px">
+                                    <%= new Date(u.createdAt).toLocaleDateString() %>
+                                </p>
+                                <span class="status-badge <%= u.isOnline ? 'status-online' : 'status-offline' %>">
+                                    <%= u.isOnline ? 'Online' : 'Offline' %>
+                                </span>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+                <button class="show-more-btn">Show More</button>
+            </div>
+
+            <!-- Top Likers -->
+            <div class="card">
+                <h3>Top Likers</h3>
+                <div class="user-list">
+                    <% topLikers.forEach(function(u) { %>
+                        <div class="user-item">
+                            <div class="user-item-left">
+                                <img src="<%= u.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name || 'Liker')+'&background=random' %>"
+                                    onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(u.name || 'Liker')+'&background=random'">
+                                <div class="user-item-info">
+                                    <h4>
+                                        <%= u.name || 'N/A' %>
+                                    </h4>
+                                    <p>
+                                        <%= u.userName || '-' %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="user-item-right">
+                                <span class="status-badge" style="background:#eef2ff; color:#6366f1;">
+                                    <%= u.likes %> likes
+                                </span>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartData = <% - JSON.stringify(chartData) %>;
+
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Users',
+                            data: chartData.users,
+                            borderColor: '#f59e0b',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Posts',
+                            data: chartData.posts,
+                            borderColor: '#10b981',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Videos',
+                            data: chartData.videos,
+                            borderColor: '#818cf8',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'User Reports',
+                            data: chartData.userReports,
+                            borderColor: '#ef4444',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Post Reports',
+                            data: chartData.postReports,
+                            borderColor: '#06b6d4',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                font: { family: 'Inter', size: 12 },
+                                color: '#6b7280'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e5e7eb', drawBorder: false },
+                            border: { dash: [5, 5] },
+                            ticks: { color: '#9ca3af', font: { family: 'Inter', size: 11 } }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#9ca3af', font: { family: 'Inter', size: 11 } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <%- include('partials/footer') %>

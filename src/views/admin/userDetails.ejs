@@ -1,0 +1,1409 @@
+<%- include('partials/header', { pageTitle: 'User Details' , page: 'users' }) %>
+
+    <style>
+        /* ─── Layout ─────────────── */
+        .ud-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* ─── Hero Card ──────────── */
+        .ud-hero-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .ud-hero-banner {
+            height: 80px;
+            background: linear-gradient(135deg, #818cf8, #6366f1 50%, #a78bfa);
+        }
+
+        .ud-hero-body {
+            padding: 0 20px 20px;
+            text-align: center;
+        }
+
+        .ud-avatar-wrap {
+            position: relative;
+            display: inline-block;
+            margin-top: -40px;
+            margin-bottom: 10px;
+        }
+
+        .ud-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+        }
+
+        .ud-dot {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .ud-dot.on {
+            background: #22c55e;
+        }
+
+        .ud-dot.off {
+            background: #94a3b8;
+        }
+
+        .ud-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0 0 3px;
+        }
+
+        .ud-uname {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0 0 12px;
+        }
+
+        .ud-badges {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .ud-badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ud-badge.vip {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .ud-badge.blocked {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .ud-badge.admin {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .ud-badge.agency {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .ud-badge.host {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+
+        .ud-badge.verified {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Action Buttons */
+        .ud-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .ud-btn {
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity .2s;
+        }
+
+        .ud-btn:hover {
+            opacity: .85;
+        }
+
+        .ud-btn.block {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .ud-btn.unblock {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .ud-btn.del {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Info List */
+        .ud-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        .ud-info-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .ud-info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .ud-ii {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6366f1;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .ud-il {
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        .ud-iv {
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        /* Social Strip */
+        .ud-social {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            margin-top: 14px;
+        }
+
+        .ud-social h5 {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin: 0 0 12px;
+        }
+
+        .ud-stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            text-align: center;
+            gap: 8px;
+        }
+
+        .ud-sn {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .ud-sl {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* Activity Strip */
+        .ud-activity {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            margin-top: 14px;
+        }
+
+        .ud-activity h5 {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin: 0 0 12px;
+        }
+
+        .ud-act-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .ud-act-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .ud-act-num {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .ud-act-icon {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .ud-act-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Right Column */
+        .ud-right {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Stat Cards */
+        .ud-coin-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .ud-coin-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ud-ci {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .ud-cl {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .ud-cv {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Account Card */
+        .ud-acct-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            padding: 18px 20px;
+        }
+
+        .ud-acct-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 14px;
+            color: var(--text-dark);
+        }
+
+        .ud-acct-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+        }
+
+        .ud-acct-row:last-child {
+            border-bottom: none;
+        }
+
+        .ud-acct-row .lbl {
+            color: var(--text-muted);
+        }
+
+        /* Tabs */
+        .ud-tabs-wrap {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .ud-tab-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 16px;
+            overflow-x: auto;
+            gap: 2px;
+        }
+
+        .ud-tab-nav::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .ud-tab-btn {
+            padding: 13px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all .15s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .ud-tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .ud-tab-body {
+            padding: 18px 20px;
+        }
+
+        .ud-tab-pane {
+            display: none;
+        }
+
+        .ud-tab-pane.active {
+            display: block;
+        }
+
+        /* History Summaries */
+        .ud-hist-sums {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .ud-hsc {
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .ud-hsc.all {
+            background: #f8fafc;
+        }
+
+        .ud-hsc.inc {
+            background: #f0fdf4;
+        }
+
+        .ud-hsc.out {
+            background: #fef2f2;
+        }
+
+        .ud-hsi {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .ud-hsi.all {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .ud-hsi.inc {
+            background: #bbf7d0;
+            color: #166534;
+        }
+
+        .ud-hsi.out {
+            background: #fecaca;
+            color: #b91c1c;
+        }
+
+        /* Txn List */
+        .ud-txn-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .ud-txn-item:last-child {
+            border-bottom: none;
+        }
+
+        .ud-txi {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .ud-txi.inc {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .ud-txi.out {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .ud-tit {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .ud-tdt {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .ud-tam {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .ud-tam.inc {
+            color: #16a34a;
+        }
+
+        .ud-tam.out {
+            color: #dc2626;
+        }
+
+        /* User Cards (followers / following) */
+        .ud-user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .ud-user-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .ud-uca {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .ud-ucn {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .ud-ucu {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .ud-uc-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .ud-uc-dot.on {
+            background: #22c55e;
+        }
+
+        .ud-uc-dot.off {
+            background: #94a3b8;
+        }
+
+        /* Video / Post Grid */
+        .ud-media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .ud-media-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .ud-media-thumb {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ud-media-info {
+            padding: 8px;
+        }
+
+        .ud-media-caption {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ud-media-stats {
+            display: flex;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Live Sessions */
+        .ud-live-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .ud-live-item:last-child {
+            border-bottom: none;
+        }
+
+        .ud-live-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .ud-live-icon.normal {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .ud-live-icon.pk {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .ud-live-icon.audio {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .ud-ltitle {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .ud-lmeta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .ud-lpills {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ud-lpill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #f3f4f6;
+            color: #6b7280;
+            margin-left: 4px;
+        }
+
+        .ud-lpill.coin {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .ud-lpill.view {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        /* Empty state */
+        .ud-empty {
+            text-align: center;
+            padding: 36px 20px;
+            color: var(--text-muted);
+        }
+
+        .ud-empty i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+            opacity: .25;
+        }
+
+        .ud-empty p {
+            font-size: 13px;
+        }
+    </style>
+
+    <!-- Page Header -->
+    <div class="dashboard-header">
+        <div>
+            <h1 style="display:flex;align-items:center;gap:12px;">
+                <a href="/admin/users" style="color:var(--text-muted);font-size:20px;"><i
+                        class="fa fa-arrow-left"></i></a>
+                User Profile
+            </h1>
+            <p>Detailed profile, activity, coin history, and social graph</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <form method="POST" action="/admin/users/<%= user._id %>/block" style="display:inline;">
+                <button type="submit" class="ud-btn <%= user.isBlock ? 'unblock' : 'block' %>">
+                    <i class="fa <%= user.isBlock ? 'fa-unlock' : 'fa-lock' %>"></i>
+                    <%= user.isBlock ? 'Unblock' : 'Block User' %>
+                </button>
+            </form>
+            <form method="POST" action="/admin/users/<%= user._id %>/delete"
+                onsubmit="return confirm('Permanently delete this user?')" style="display:inline;">
+                <button type="submit" class="ud-btn del"><i class="fa fa-trash-o"></i> Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="ud-layout">
+        <!-- ── LEFT COLUMN ── -->
+        <div>
+            <!-- Profile Hero Card -->
+            <div class="ud-hero-card">
+                <div class="ud-hero-banner"></div>
+                <div class="ud-hero-body">
+                    <div class="ud-avatar-wrap">
+                        <img class="ud-avatar"
+                            src="<%= user.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(user.name||'U')+'&background=818cf8&color=fff&bold=true' %>"
+                            onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(user.name||'U')+'&background=818cf8&color=fff&bold=true'">
+                        <span class="ud-dot <%= user.isOnline ? 'on' : 'off' %>"></span>
+                    </div>
+                    <h2 class="ud-name">
+                        <%= user.name || 'Unknown User' %>
+                    </h2>
+                    <p class="ud-uname">@<%= user.userName || '-' %> &nbsp;·&nbsp; #<%= user.uniqueId || '—' %>
+                    </p>
+                    <div class="ud-badges">
+                        <% if(user.isVIP) { %><span class="ud-badge vip"><i class="fa fa-crown"></i> VIP</span>
+                            <% } %>
+                                <% if(user.isBlock) { %><span class="ud-badge blocked"><i class="fa fa-ban"></i>
+                                        Blocked</span>
+                                    <% } %>
+                                        <% if(user.isVerified) { %><span class="ud-badge verified"><i
+                                                    class="fa fa-check"></i> Verified</span>
+                                            <% } %>
+                                                <% if(user.isHost) { %><span class="ud-badge host"><i
+                                                            class="fa fa-microphone"></i> Host</span>
+                                                    <% } %>
+                                                        <% if(user.role===1) { %><span class="ud-badge admin"><i
+                                                                    class="fa fa-shield"></i> Admin</span>
+                                                            <% } %>
+                                                                <% if(user.role===2) { %><span
+                                                                        class="ud-badge agency"><i
+                                                                            class="fa fa-building"></i> Agency</span>
+                                                                    <% } %>
+                    </div>
+                    <div class="ud-actions">
+                        <form method="POST" action="/admin/users/<%= user._id %>/block" style="margin:0;">
+                            <button type="submit" class="ud-btn <%= user.isBlock ? 'unblock' : 'block' %>">
+                                <i class="fa <%= user.isBlock ? 'fa-unlock-alt' : 'fa-lock' %>"></i>
+                                <%= user.isBlock ? 'Unblock' : 'Block' %>
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/users/<%= user._id %>/verify" style="margin:0;">
+                            <button type="submit" class="ud-btn" style="background:#eff6ff;color:#1d4ed8;">
+                                <i class="fa fa-check-circle"></i>
+                                <%= user.isVerified ? 'Unverify' : 'Verify' %>
+                            </button>
+                        </form>
+                    </div>
+                    <!-- Info List -->
+                    <ul class="ud-info-list">
+                        <li><span class="ud-ii"><i class="fa fa-envelope-o"></i></span><span
+                                class="ud-il">Email</span><span class="ud-iv">
+                                <%= user.email || '—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i
+                                    class="fa <%= user.gender==='Female'?'fa-venus':'fa-mars' %>"></i></span><span
+                                class="ud-il">Gender</span><span class="ud-iv">
+                                <%= user.gender||'—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-birthday-cake"></i></span><span
+                                class="ud-il">Age</span><span class="ud-iv">
+                                <%= user.age||'—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-globe"></i></span><span
+                                class="ud-il">Country</span><span class="ud-iv">
+                                <%= user.country||'—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-phone"></i></span><span class="ud-il">Mobile</span><span
+                                class="ud-iv">
+                                <%= user.mobileNumber||'—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-calendar"></i></span><span
+                                class="ud-il">Joined</span><span class="ud-iv">
+                                <%= new
+                                    Date(user.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+                                    %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-clock-o"></i></span><span class="ud-il">Last
+                                Login</span><span class="ud-iv">
+                                <%= user.lastlogin ? new
+                                    Date(user.lastlogin).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+                                    : '—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-tag"></i></span><span class="ud-il">Referral</span><span
+                                class="ud-iv" style="font-family:monospace">
+                                <%= user.referralCode||'—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-code"></i></span><span class="ud-il">Wealth
+                                Level</span><span class="ud-iv">
+                                <%= user.wealthLevel||'—' %>
+                            </span></li>
+                        <li><span class="ud-ii"><i class="fa fa-map-marker"></i></span><span class="ud-il">IP
+                                Address</span><span class="ud-iv">
+                                <%= user.ipAddress||'—' %>
+                            </span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Social Stats -->
+            <div class="ud-social">
+                <h5>Social Stats</h5>
+                <div class="ud-stat-row">
+                    <div>
+                        <div class="ud-sn">
+                            <%= user.totalFollowers||0 %>
+                        </div>
+                        <div class="ud-sl">Followers</div>
+                    </div>
+                    <div>
+                        <div class="ud-sn">
+                            <%= user.totalFollowing||0 %>
+                        </div>
+                        <div class="ud-sl">Following</div>
+                    </div>
+                    <div>
+                        <div class="ud-sn">
+                            <%= user.totalFriends||0 %>
+                        </div>
+                        <div class="ud-sl">Friends</div>
+                    </div>
+                    <div>
+                        <div class="ud-sn">
+                            <%= user.totalVisitors||0 %>
+                        </div>
+                        <div class="ud-sl">Visitors</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Stats -->
+            <div class="ud-activity">
+                <h5>Activity Stats</h5>
+                <div class="ud-act-grid">
+                    <div class="ud-act-item">
+                        <div class="ud-act-icon">🎬</div>
+                        <div class="ud-act-num">
+                            <%= stats.totalVideos %>
+                        </div>
+                        <div class="ud-act-lbl">Videos</div>
+                    </div>
+                    <div class="ud-act-item">
+                        <div class="ud-act-icon">📝</div>
+                        <div class="ud-act-num">
+                            <%= stats.totalPosts %>
+                        </div>
+                        <div class="ud-act-lbl">Posts</div>
+                    </div>
+                    <div class="ud-act-item">
+                        <div class="ud-act-icon">🔴</div>
+                        <div class="ud-act-num">
+                            <%= stats.totalLives %>
+                        </div>
+                        <div class="ud-act-lbl">Live Sessions</div>
+                    </div>
+                    <div class="ud-act-item">
+                        <div class="ud-act-icon">⚔️</div>
+                        <div class="ud-act-num">
+                            <%= stats.totalPkBattles %>
+                        </div>
+                        <div class="ud-act-lbl">PK Battles</div>
+                    </div>
+                    <div class="ud-act-item">
+                        <div class="ud-act-icon">👁️</div>
+                        <div class="ud-act-num">
+                            <%= stats.totalViews %>
+                        </div>
+                        <div class="ud-act-lbl">Total Views</div>
+                    </div>
+                    <div class="ud-act-item">
+                        <div class="ud-act-icon">⭐</div>
+                        <div class="ud-act-num">
+                            <%= stats.totalLiveCoins %>
+                        </div>
+                        <div class="ud-act-lbl">Live Coins</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── RIGHT COLUMN ── -->
+        <div class="ud-right">
+
+            <!-- Coin Cards -->
+            <div class="ud-coin-grid">
+                <div class="ud-coin-card">
+                    <div class="ud-ci icon-orange"><i class="fa fa-star"></i></div>
+                    <div>
+                        <div class="ud-cl">Coin Balance</div>
+                        <div class="ud-cv">
+                            <%= (user.coin||0).toLocaleString() %>
+                        </div>
+                    </div>
+                </div>
+                <div class="ud-coin-card">
+                    <div class="ud-ci icon-green"><i class="fa fa-arrow-down"></i></div>
+                    <div>
+                        <div class="ud-cl">Received</div>
+                        <div class="ud-cv" style="color:#16a34a">
+                            <%= (user.receivedCoins||0).toLocaleString() %>
+                        </div>
+                    </div>
+                </div>
+                <div class="ud-coin-card">
+                    <div class="ud-ci icon-red"><i class="fa fa-arrow-up"></i></div>
+                    <div>
+                        <div class="ud-cl">Spent</div>
+                        <div class="ud-cv" style="color:#dc2626">
+                            <%= (user.spentCoins||0).toLocaleString() %>
+                        </div>
+                    </div>
+                </div>
+                <div class="ud-coin-card">
+                    <div class="ud-ci icon-blue"><i class="fa fa-diamond"></i></div>
+                    <div>
+                        <div class="ud-cl">Diamonds</div>
+                        <div class="ud-cv" style="color:#3b82f6">
+                            <%= (user.diamond||0).toLocaleString() %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Security -->
+            <div class="ud-acct-card">
+                <h4><i class="fa fa-shield" style="color:var(--primary);margin-right:7px;"></i>Account Security & Status
+                </h4>
+                <div class="ud-acct-row"><span class="lbl">Verification</span>
+                    <span style="color:<%= user.isVerified?'#16a34a':'#dc2626' %>;font-weight:600;"><i
+                            class="fa <%= user.isVerified?'fa-check-circle':'fa-times-circle' %>"></i>
+                        <%= user.isVerified?'Verified':'Unverified' %>
+                    </span>
+                </div>
+                <div class="ud-acct-row"><span class="lbl">Account Type</span>
+                    <span>
+                        <%= user.isFake?'🤖 Bot Account':'✅ Real User' %>
+                    </span>
+                </div>
+                <div class="ud-acct-row"><span class="lbl">Login Provider</span>
+                    <span>
+                        <% if(user.loginType===1){%><i class="fa fa-phone"></i> Phone<%}else if(user.loginType===2){%><i
+                                    class="fa fa-apple"></i> Apple<%}else if(user.loginType===3){%><i
+                                        class="fa fa-google"></i> Google<%}else{%><i class="fa fa-envelope"></i> Email
+                                        <%}%>
+                    </span>
+                </div>
+                <div class="ud-acct-row"><span class="lbl">Block Status</span>
+                    <span class="status-badge <%= user.isBlock?'status-offline':'status-online' %>">
+                        <%= user.isBlock?'🚫 Blocked':'✅ Active' %>
+                    </span>
+                </div>
+                <div class="ud-acct-row"><span class="lbl">VIP Status</span>
+                    <span>
+                        <%= user.isVIP?'👑 VIP Member':'Regular User' %>
+                    </span>
+                </div>
+                <div class="ud-acct-row"><span class="lbl">Identity Doc</span>
+                    <span>
+                        <%= user.identity||'Not provided' %>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tabbed Content -->
+            <div class="ud-tabs-wrap">
+                <div class="ud-tab-nav">
+                    <button class="ud-tab-btn active" data-tab="hist" onclick="showTab(this,'hist')"><i
+                            class="fa fa-history"></i> Coins</button>
+                    <button class="ud-tab-btn" data-tab="videos" onclick="showTab(this,'videos')"><i
+                            class="fa fa-video-camera"></i> Videos (<%= stats.totalVideos %>)</button>
+                    <button class="ud-tab-btn" data-tab="posts" onclick="showTab(this,'posts')"><i
+                            class="fa fa-image"></i> Posts (<%= stats.totalPosts %>)</button>
+                    <button class="ud-tab-btn" data-tab="lives" onclick="showTab(this,'lives')"><i class="fa fa-circle"
+                            style="color:#ef4444;"></i> Lives (<%= stats.totalLives %>)</button>
+                    <button class="ud-tab-btn" data-tab="pk" onclick="showTab(this,'pk')"><i class="fa fa-bolt"
+                            style="color:#f59e0b;"></i> PK (<%= stats.totalPkBattles %>)</button>
+                    <button class="ud-tab-btn" data-tab="followers" onclick="showTab(this,'followers')"><i
+                            class="fa fa-users"></i> Followers (<%= stats.totalFollowers %>)</button>
+                    <button class="ud-tab-btn" data-tab="following" onclick="showTab(this,'following')"><i
+                            class="fa fa-user-plus"></i> Following (<%= stats.totalFollowing %>)</button>
+                    <button class="ud-tab-btn" data-tab="visitors" onclick="showTab(this,'visitors')"><i
+                            class="fa fa-eye"></i> Visitors (<%= stats.totalVisitors %>)</button>
+                    <button class="ud-tab-btn" data-tab="vip" onclick="showTab(this,'vip')"><i class="fa fa-crown"
+                            style="color:#f59e0b;"></i> VIP</button>
+                </div>
+                <div class="ud-tab-body">
+
+                    <!-- Coin History -->
+                    <div id="tab-hist" class="ud-tab-pane active">
+                        <div class="ud-hist-sums">
+                            <div class="ud-hsc all">
+                                <div class="ud-hsi all"><i class="fa fa-exchange"></i></div>
+                                <div>
+                                    <div style="font-size:10px;color:var(--text-muted)">Transactions</div>
+                                    <div style="font-size:16px;font-weight:800;">
+                                        <%= stats.totalTransactions %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ud-hsc inc">
+                                <div class="ud-hsi inc"><i class="fa fa-arrow-down"></i></div>
+                                <div>
+                                    <div style="font-size:10px;color:var(--text-muted)">Total Income</div>
+                                    <div style="font-size:16px;font-weight:800;color:#16a34a">
+                                        <%= stats.totalIncome %> ⭐
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ud-hsc out">
+                                <div class="ud-hsi out"><i class="fa fa-arrow-up"></i></div>
+                                <div>
+                                    <div style="font-size:10px;color:var(--text-muted)">Total Spent</div>
+                                    <div style="font-size:16px;font-weight:800;color:#dc2626">
+                                        <%= stats.totalOutgoing %> ⭐
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% if(history.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-inbox"></i>
+                                <p>No coin transactions found.</p>
+                            </div>
+                            <% }else{ history.forEach(function(h){ %>
+                                <div class="ud-txn-item">
+                                    <div class="ud-txi <%= h.isIncome?'inc':'out' %>">
+                                        <% if(h.title==='Login Bonus' ){%><i class="fa fa-gift"></i>
+                                            <%}else if(h.title==='Top Up' ||h.title==='Recharge' ){%><i
+                                                    class="fa fa-credit-card"></i>
+                                                <%}else if(h.title==='Gift to Host' ){%><i class="fa fa-heart"></i>
+                                                    <%}else{%><i class="fa fa-star"></i>
+                                                        <%}%>
+                                    </div>
+                                    <div style="flex:1">
+                                        <div class="ud-tit">
+                                            <%= h.title||'Transaction' %>
+                                        </div>
+                                        <div class="ud-tdt">
+                                            <%= new
+                                                Date(h.createdAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})
+                                                %>
+                                        </div>
+                                    </div>
+                                    <div class="ud-tam <%= h.isIncome?'inc':'out' %>">
+                                        <%= h.isIncome?'+':'-' %>
+                                            <%= h.coin %> ⭐
+                                    </div>
+                                </div>
+                                <% })} %>
+                    </div>
+
+                    <!-- Videos Tab -->
+                    <div id="tab-videos" class="ud-tab-pane">
+                        <% if(videos.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-video-camera"></i>
+                                <p>This user hasn't uploaded any videos yet.</p>
+                            </div>
+                            <% }else{ %>
+                                <div class="ud-media-grid">
+                                    <% videos.forEach(function(v){ %>
+                                        <div class="ud-media-item">
+                                            <div
+                                                style="width:100%;height:100px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;">
+                                                <% if(v.videoImage){ %><img src="<%= v.videoImage %>"
+                                                        style="width:100%;height:100%;object-fit:cover;"
+                                                        onerror="this.parentNode.innerHTML='<i class=\'fa fa-video-camera\' style=\'font-size:28px;\'></i>'">
+                                                    <% }else{ %><i class="fa fa-video-camera"
+                                                            style="font-size:28px;"></i>
+                                                        <% } %>
+                                            </div>
+                                            <div class="ud-media-info">
+                                                <div class="ud-media-caption">
+                                                    <%= v.caption||'No caption' %>
+                                                </div>
+                                                <div class="ud-media-stats">
+                                                    <span><i class="fa fa-heart"></i>
+                                                        <%= v.totalLikes||0 %>
+                                                    </span>
+                                                    <span><i class="fa fa-comment"></i>
+                                                        <%= v.totalComments||0 %>
+                                                    </span>
+                                                    <span><i class="fa fa-share"></i>
+                                                        <%= v.shareCount||0 %>
+                                                    </span>
+                                                </div>
+                                                <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">
+                                                    <%= new Date(v.createdAt).toLocaleDateString() %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+                    </div>
+
+                    <!-- Posts Tab -->
+                    <div id="tab-posts" class="ud-tab-pane">
+                        <% if(posts.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-image"></i>
+                                <p>This user hasn't published any posts yet.</p>
+                            </div>
+                            <% }else{ %>
+                                <div class="ud-media-grid">
+                                    <% posts.forEach(function(p){ %>
+                                        <div class="ud-media-item">
+                                            <div
+                                                style="width:100%;height:100px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;">
+                                                <% if(p.postImage && p.postImage.length>0 && p.postImage[0].url){ %>
+                                                    <img src="<%= p.postImage[0].url %>"
+                                                        style="width:100%;height:100%;object-fit:cover;"
+                                                        onerror="this.parentNode.innerHTML='<i class=\'fa fa-image\' style=\'font-size:28px;\'></i>'">
+                                                    <% }else{ %><i class="fa fa-image" style="font-size:28px;"></i>
+                                                        <% } %>
+                                            </div>
+                                            <div class="ud-media-info">
+                                                <div class="ud-media-caption">
+                                                    <%= p.caption||'No caption' %>
+                                                </div>
+                                                <div class="ud-media-stats">
+                                                    <span><i class="fa fa-heart"></i>
+                                                        <%= p.totalLikes||0 %>
+                                                    </span>
+                                                    <span><i class="fa fa-comment"></i>
+                                                        <%= p.totalComments||0 %>
+                                                    </span>
+                                                </div>
+                                                <div style="font-size:10px;color:var(--text-muted);margin-top:3px;">
+                                                    <%= new Date(p.createdAt).toLocaleDateString() %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+                    </div>
+
+                    <!-- Live Sessions Tab -->
+                    <div id="tab-lives" class="ud-tab-pane">
+                        <% if(liveSessions.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-circle"></i>
+                                <p>No live sessions found for this user.</p>
+                            </div>
+                            <% }else{ liveSessions.forEach(function(l){ %>
+                                <div class="ud-live-item">
+                                    <div class="ud-live-icon <%= l.liveType===2?'audio':'normal' %>">
+                                        <% if(l.liveType===2){ %><i class="fa fa-microphone"></i>
+                                            <% }else{ %><i class="fa fa-video-camera"></i>
+                                                <% } %>
+                                    </div>
+                                    <div style="flex:1;">
+                                        <div class="ud-ltitle">
+                                            <%= l.roomName||'Live Session' %>
+                                        </div>
+                                        <div class="ud-lmeta">
+                                            <%= new
+                                                Date(l.createdAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})
+                                                %> &nbsp;·&nbsp; <%= l.liveType===2?'Audio Room':'Video Live' %>
+                                        </div>
+                                    </div>
+                                    <div class="ud-lpills">
+                                        <span class="ud-lpill view"><i class="fa fa-eye"></i>
+                                            <%= l.view||0 %>
+                                        </span>
+                                        <span class="ud-lpill coin"><i class="fa fa-star"></i>
+                                            <%= l.totalCoinsEarned||0 %>
+                                        </span>
+                                        <span class="ud-lpill"
+                                            style="<%= l.isActive?'background:#dcfce7;color:#166534;':'background:#f1f5f9;color:#64748b;' %>">
+                                            <%= l.isActive?'🔴 Live':'Ended' %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <% }) %>
+                                    <% } %>
+                    </div>
+
+                    <!-- PK Battles Tab -->
+                    <div id="tab-pk" class="ud-tab-pane">
+                        <% if(pkBattles.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-bolt"></i>
+                                <p>No PK battles found for this user.</p>
+                            </div>
+                            <% }else{ pkBattles.forEach(function(p){ %>
+                                <div class="ud-live-item">
+                                    <div class="ud-live-icon pk">⚔️</div>
+                                    <div style="flex:1;">
+                                        <div class="ud-ltitle">
+                                            <%= p.roomName||'PK Battle' %>
+                                        </div>
+                                        <div class="ud-lmeta">
+                                            <%= new
+                                                Date(p.createdAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})
+                                                %> &nbsp;·&nbsp; vs Host2: <%= p.host2Id||'?' %>
+                                        </div>
+                                    </div>
+                                    <div class="ud-lpills">
+                                        <span class="ud-lpill view"><i class="fa fa-eye"></i>
+                                            <%= p.view||0 %>
+                                        </span>
+                                        <span class="ud-lpill coin"><i class="fa fa-star"></i>
+                                            <%= p.totalCoinsEarned||0 %>
+                                        </span>
+                                        <span class="ud-lpill" style="background:#fee2e2;color:#b91c1c;">⚔️ PK</span>
+                                    </div>
+                                </div>
+                                <% }) %>
+                                    <% } %>
+                    </div>
+
+                    <!-- Followers Tab -->
+                    <div id="tab-followers" class="ud-tab-pane">
+                        <% if(followers.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-users"></i>
+                                <p>No followers yet.</p>
+                            </div>
+                            <% }else{ %>
+                                <div class="ud-user-grid">
+                                    <% followers.forEach(function(f){ var u=f.userId||{}; %>
+                                        <div class="ud-user-card">
+                                            <img class="ud-uca"
+                                                src="<%= u.image||'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name||'U')+'&background=818cf8&color=fff' %>"
+                                                onerror="this.src='https://ui-avatars.com/api/?name=U&background=818cf8&color=fff'">
+                                            <div>
+                                                <div class="ud-ucn">
+                                                    <%= u.name||'Unknown' %>
+                                                        <% if(u.isVIP){%>👑<%}%>
+                                                </div>
+                                                <div class="ud-ucu"><span
+                                                        class="ud-uc-dot <%= u.isOnline?'on':'off' %>"></span>@<%=
+                                                        u.userName||'-' %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+                    </div>
+
+                    <!-- Following Tab -->
+                    <div id="tab-following" class="ud-tab-pane">
+                        <% if(following.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-user-plus"></i>
+                                <p>Not following anyone yet.</p>
+                            </div>
+                            <% }else{ %>
+                                <div class="ud-user-grid">
+                                    <% following.forEach(function(f){ var u=f.followingId||{}; %>
+                                        <div class="ud-user-card">
+                                            <img class="ud-uca"
+                                                src="<%= u.image||'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name||'U')+'&background=818cf8&color=fff' %>"
+                                                onerror="this.src='https://ui-avatars.com/api/?name=U&background=818cf8&color=fff'">
+                                            <div>
+                                                <div class="ud-ucn">
+                                                    <%= u.name||'Unknown' %>
+                                                        <% if(u.isVIP){%>👑<%}%>
+                                                </div>
+                                                <div class="ud-ucu"><span
+                                                        class="ud-uc-dot <%= u.isOnline?'on':'off' %>"></span>@<%=
+                                                        u.userName||'-' %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+                    </div>
+
+                    <!-- Visitors Tab -->
+                    <div id="tab-visitors" class="ud-tab-pane">
+                        <% if(visitors.length===0){ %>
+                            <div class="ud-empty"><i class="fa fa-eye"></i>
+                                <p>No profile visitors recorded.</p>
+                            </div>
+                            <% }else{ %>
+                                <div class="ud-user-grid">
+                                    <% visitors.forEach(function(v){ var u=v.visitorId||{}; %>
+                                        <div class="ud-user-card">
+                                            <img class="ud-uca"
+                                                src="<%= u.image||'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name||'U')+'&background=818cf8&color=fff' %>"
+                                                onerror="this.src='https://ui-avatars.com/api/?name=U&background=818cf8&color=fff'">
+                                            <div>
+                                                <div class="ud-ucn">
+                                                    <%= u.name||'Unknown' %>
+                                                </div>
+                                                <div class="ud-ucu"><span
+                                                        class="ud-uc-dot <%= u.isOnline?'on':'off' %>"></span>@<%=
+                                                        u.userName||'-' %>
+                                                </div>
+                                                <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">
+                                                    <%= new Date(v.createdAt).toLocaleDateString() %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+                    </div>
+
+                    <!-- VIP Tab -->
+                    <div id="tab-vip" class="ud-tab-pane">
+                        <% if(user.isVIP){ %>
+                            <div
+                                style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:12px;padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                                <div style="font-size:40px;">👑</div>
+                                <div>
+                                    <div style="font-size:18px;font-weight:800;color:#92400e;">VIP Member</div>
+                                    <div style="font-size:13px;color:#a16207;margin-top:3px;">This user has an active
+                                        VIP subscription.</div>
+                                </div>
+                            </div>
+                            <div class="ud-acct-row"><span class="lbl">VIP Plan</span><span style="font-weight:600;">
+                                    <%= user.vipPlanId?'Active Plan':'—' %>
+                                </span></div>
+                            <div class="ud-acct-row"><span class="lbl">VIP Since</span><span style="font-weight:600;">
+                                    <%= user.vipStartDate?new Date(user.vipStartDate).toLocaleDateString():'—' %>
+                                </span></div>
+                            <div class="ud-acct-row"><span class="lbl">VIP Expires</span><span style="font-weight:600;">
+                                    <%= user.vipExpirationDate?new Date(user.vipExpirationDate).toLocaleDateString():'—'
+                                        %>
+                                </span></div>
+                            <% }else{ %>
+                                <div class="ud-empty"><i class="fa fa-crown"></i>
+                                    <p>This user does not have an active VIP subscription.</p>
+                                </div>
+                                <% } %>
+                    </div>
+
+                </div><!-- tab-body -->
+            </div><!-- tabs-wrap -->
+        </div><!-- right -->
+    </div><!-- layout -->
+
+    <script>
+        function showTab(btn, id) {
+            document.querySelectorAll('.ud-tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.ud-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+        }
+    </script>
+
+    <%- include('partials/footer') %>

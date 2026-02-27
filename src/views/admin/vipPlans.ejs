@@ -1,0 +1,175 @@
+<%- include('partials/header', { pageTitle: 'VIP Plans' , page: 'vip-plans' }) %>
+
+    <div class="dashboard-header">
+        <div>
+            <h1>VIP Subscriptions</h1>
+            <p>Manage VIP packages, pricing, and benefits</p>
+        </div>
+        <button class="btn btn-primary" onclick="document.getElementById('addModal').style.display='flex'">
+            <i class="fa fa-plus"></i> Add New Plan
+        </button>
+    </div>
+
+    <div class="card" style="padding: 24px;">
+        <% if (plans && plans.length> 0) { %>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
+                <% plans.forEach(plan=> { %>
+                    <div
+                        style="border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; position: relative; <%= plan.isPopular ? 'border-color: var(--primary); box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1);' : '' %>">
+
+                        <% if(plan.isPopular) { %>
+                            <div
+                                style="position: absolute; top: -12px; right: 24px; background: var(--primary); color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                                Most Popular</div>
+                            <% } %>
+
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img src="<%= plan.icon %>" alt="icon"
+                                            style="width: 40px; height: 40px; object-fit: contain;">
+                                        <div>
+                                            <h3 style="margin: 0; font-size: 18px;">
+                                                <%= plan.name %>
+                                            </h3>
+                                            <div style="color: var(--text-muted); font-size: 13px;">Valid for <%=
+                                                    plan.validity %>
+                                                    <%= plan.validityType %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between;">
+                                    <div>
+                                        <div
+                                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
+                                            Coin Price</div>
+                                        <div style="font-weight: 700; color: #f59e0b;"><i class="fa fa-star"></i>
+                                            <%= plan.coinPrice %>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div
+                                            style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">
+                                            Fiat Price</div>
+                                        <div style="font-weight: 700; color: #10b981;">$<%= plan.amount %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom: 20px;">
+                                    <div
+                                        style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">
+                                        Benefits</div>
+                                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px;">
+                                        <% if(plan.benefits && plan.benefits.length> 0) { %>
+                                            <% plan.benefits.forEach(b=> { %>
+                                                <li
+                                                    style="margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                                                    <i class="fa fa-check-circle" style="color: var(--primary);"></i>
+                                                    <%= b %>
+                                                </li>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <li
+                                                            style="color: var(--text-muted); font-size: 13px; font-style: italic;">
+                                                            No specific benefits listed.</li>
+                                                        <% } %>
+                                    </ul>
+                                </div>
+
+                                <form action="/admin/vip-plans/<%= plan._id %>/delete" method="POST"
+                                    onsubmit="return confirm('Delete this VIP Plan?');" style="margin: 0;">
+                                    <button type="submit" class="btn btn-danger" style="width: 100%;"><i
+                                            class="fa fa-trash"></i> Delete Plan</button>
+                                </form>
+                    </div>
+                    <% }) %>
+            </div>
+            <% } else { %>
+                <div style="text-align: center; padding: 48px 0;">
+                    <div style="font-size: 48px; color: var(--border-color); margin-bottom: 16px;"><i
+                            class="fa fa-diamond"></i></div>
+                    <h3 style="margin-bottom: 8px; color: var(--text-dark);">No VIP Plans Configured</h3>
+                    <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto;">Create subscription packages
+                        to allow users to upgrade their accounts and enjoy premium features.</p>
+                </div>
+                <% } %>
+    </div>
+
+    <!-- Add Modal -->
+    <div id="addModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; padding: 32px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 style="margin: 0;">Create VIP Plan</h2>
+                <button class="btn" onclick="document.getElementById('addModal').style.display='none'"
+                    style="background: transparent; color: var(--text-muted);"><i class="fa fa-times"
+                        style="font-size: 20px;"></i></button>
+            </div>
+            <form action="/admin/vip-plans/create" method="POST">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Plan Name</label>
+                    <input type="text" name="name" required
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"
+                        placeholder="e.g., VIP Gold">
+                </div>
+                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Validity Amount</label>
+                        <input type="number" name="validity" required
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"
+                            placeholder="e.g., 30">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Validity Type</label>
+                        <select name="validityType" required
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                            <option value="days">Days</option>
+                            <option value="months">Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Coin Price (in-app)</label>
+                        <input type="number" name="coinPrice" required value="0"
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Fiat Amount (USD)</label>
+                        <input type="number" step="0.01" name="amount" required value="0"
+                            style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Benefits (Comma
+                        separated)</label>
+                    <input type="text" name="benefits"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"
+                        placeholder="e.g., Premium Badge, No Ads, Custom Profile">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Icon URL</label>
+                    <input type="text" name="icon" value="https://cdn-icons-png.flaticon.com/512/3284/3284938.png"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" name="isPopular" style="width: 18px; height: 18px;">
+                        Mark as Most Popular
+                    </label>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn" style="background:var(--bg-color); border:none;"
+                        onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

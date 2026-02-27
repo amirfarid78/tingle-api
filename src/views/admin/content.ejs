@@ -1,0 +1,63 @@
+<%- include('partials/header', { pageTitle: pageTitle, page: 'content' }) %>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>
+                    <%= type==='posts' ? 'Caption' : 'Caption' %>
+                </th>
+                <th>
+                    <%= type==='posts' ? 'Images' : 'Duration' %>
+                </th>
+                <th>Likes</th>
+                <th>Comments</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% items.forEach(function(item) { %>
+                <tr>
+                    <td>
+                        <%= item.userId ? (item.userId.name || 'Unknown' ) : 'Unknown' %>
+                    </td>
+                    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">
+                        <%= item.caption || '-' %>
+                    </td>
+                    <td>
+                        <%= type==='posts' ? (item.postImage?.length || 0) + ' images' : (item.videoTime || 0) + 's' %>
+                    </td>
+                    <td>
+                        <%= item.totalLikes || 0 %>
+                    </td>
+                    <td>
+                        <%= item.totalComments || 0 %>
+                    </td>
+                    <td>
+                        <%= new Date(item.createdAt).toLocaleDateString() %>
+                    </td>
+                    <td style="display:flex;gap:4px">
+                        <% if(type==='videos' ) { %>
+                            <form method="POST" action="/admin/videos/<%= item._id %>/ban">
+                                <button class="btn <%= item.isBanned ? 'btn-success' : 'btn-warning' %>">
+                                    <%= item.isBanned ? 'Unban' : 'Ban' %>
+                                </button>
+                            </form>
+                            <% } %>
+                                <form method="POST" action="/admin/<%= type %>/<%= item._id %>/delete"
+                                    onsubmit="return confirm('Delete?')">
+                                    <button class="btn btn-danger">Delete</button>
+                                </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+    <div class="pagination">
+        <% for(let i=1; i <=pages; i++) { %>
+            <a href="/admin/<%= type %>?page=<%= i %>" class="<%= page === i ? 'active' : '' %>">
+                <%= i %>
+            </a>
+            <% } %>
+    </div>
+    <%- include('partials/footer') %>

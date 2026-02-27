@@ -1,0 +1,412 @@
+<%- include('partials/header', { pageTitle: 'Host Management' , page: 'hosts' }) %>
+
+    <style>
+        /* Stats Grid */
+        .hm-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .hm-stat-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hm-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .hm-stat-lbl {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .hm-stat-num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        /* Table */
+        .hm-table-wrap {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .hm-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hm-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .hm-search input {
+            border: none;
+            background: none;
+            padding: 8px 0;
+            font-size: 13px;
+            outline: none;
+            width: 200px;
+        }
+
+        .hm-filter-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: #f8fafc;
+        }
+
+        th {
+            padding: 12px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 14px;
+            font-size: 13px;
+            color: var(--text-dark);
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .hm-agency-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .hm-agency-pill img {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .hm-vip-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .hm-coin {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 700;
+        }
+
+        .hm-action-btn {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: opacity .2s;
+        }
+
+        .hm-action-btn:hover {
+            opacity: .8;
+        }
+
+        .hm-btn-remove {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .hm-btn-view {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+            opacity: .25;
+        }
+    </style>
+
+    <div class="dashboard-header">
+        <div>
+            <h1><i class="fa fa-microphone" style="color:var(--primary);margin-right:10px;"></i>Host Management</h1>
+            <p>Manage and monitor host accounts, their agencies, and performance</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="hm-stats">
+        <div class="hm-stat-card">
+            <div class="hm-stat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa fa-users"></i></div>
+            <div>
+                <div class="hm-stat-lbl">Total Hosts</div>
+                <div class="hm-stat-num">
+                    <%= stats.totalHosts %>
+                </div>
+            </div>
+        </div>
+        <div class="hm-stat-card">
+            <div class="hm-stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="fa fa-mars"></i></div>
+            <div>
+                <div class="hm-stat-lbl">Males</div>
+                <div class="hm-stat-num">
+                    <%= stats.maleHosts %>
+                </div>
+            </div>
+        </div>
+        <div class="hm-stat-card">
+            <div class="hm-stat-icon" style="background:#fce7f3;color:#be185d;"><i class="fa fa-venus"></i></div>
+            <div>
+                <div class="hm-stat-lbl">Females</div>
+                <div class="hm-stat-num">
+                    <%= stats.femaleHosts %>
+                </div>
+            </div>
+        </div>
+        <div class="hm-stat-card">
+            <div class="hm-stat-icon" style="background:#fffbeb;color:#92400e;"><i class="fa fa-crown"></i></div>
+            <div>
+                <div class="hm-stat-lbl">VIP Hosts</div>
+                <div class="hm-stat-num">
+                    <%= stats.vipHosts %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="hm-table-wrap">
+        <div class="hm-toolbar">
+            <form method="GET" action="/admin/hosts" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <div class="hm-search">
+                    <i class="fa fa-search" style="color:var(--text-muted);"></i>
+                    <input type="text" name="search" value="<%= search %>" placeholder="Search Host...">
+                </div>
+                <select name="agency" class="hm-filter-select" onchange="this.form.submit()">
+                    <option value="">All Agencies</option>
+                    <% agencies.forEach(function(ag){ %>
+                        <option value="<%= ag._id %>" <%=filterAgency===ag._id.toString()?'selected':'' %>><%= ag.name
+                                %>
+                        </option>
+                        <% }) %>
+                </select>
+                <button type="submit"
+                    style="padding:8px 14px;border-radius:8px;border:1px solid var(--border-color);background:white;font-size:13px;cursor:pointer;">
+                    <i class="fa fa-filter"></i> Filter
+                </button>
+            </form>
+            <span style="font-size:13px;color:var(--text-muted);">
+                <%= hosts.length %> hosts
+            </span>
+        </div>
+
+        <% if(hosts.length===0) { %>
+            <div class="empty-state"><i class="fa fa-microphone"></i>
+                <p>No hosts found. Users become hosts when linked to an agency or manually set.</p>
+            </div>
+            <% } else { %>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Agency</th>
+                                <th>Host</th>
+                                <th>Unique ID</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>Coin</th>
+                                <th>Country</th>
+                                <th>Followers</th>
+                                <th>Following</th>
+                                <th>Friends</th>
+                                <th>Posts</th>
+                                <th>Videos</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% hosts.forEach(function(h) { %>
+                                <tr>
+                                    <!-- Agency -->
+                                    <td>
+                                        <% if(h.agencyId) { %>
+                                            <div class="hm-agency-pill">
+                                                <img src="<%= h.agencyId.image||'https://ui-avatars.com/api/?name=A&background=6366f1&color=fff' %>"
+                                                    onerror="this.src='https://ui-avatars.com/api/?name=A&background=6366f1&color=fff'">
+                                                <span>
+                                                    <%= h.agencyId.name %>
+                                                </span>
+                                            </div>
+                                            <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+                                                <%= h.agencyId.code %>
+                                            </div>
+                                            <div style="font-size:10px;color:#16a34a;">commission: <%=
+                                                    h.agencyId.commissionRate %>%</div>
+                                            <% } else { %>
+                                                <span style="color:var(--text-muted);font-size:12px;">Independent</span>
+                                                <% } %>
+                                    </td>
+
+                                    <!-- Host user -->
+                                    <td>
+                                        <div style="display:flex;align-items:center;gap:10px;">
+                                            <div style="position:relative;">
+                                                <img src="<%= h.image||'https://ui-avatars.com/api/?name='+encodeURIComponent(h.name||'H')+'&background=random' %>"
+                                                    onerror="this.src='https://ui-avatars.com/api/?name=H&background=818cf8&color=fff'"
+                                                    style="width:38px;height:38px;border-radius:50%;object-fit:cover;">
+                                                <span
+                                                    style="position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:50%;border:2px solid white;background:<%= h.isOnline?'#22c55e':'#94a3b8' %>;"></span>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight:600;font-size:13px;">
+                                                    <%= h.name||'Unknown' %>
+                                                        <% if(h.isVIP){%><span class="hm-vip-badge">👑 VIP</span>
+                                                            <%}%>
+                                                </div>
+                                                <div style="font-size:11px;color:var(--text-muted);">@<%=
+                                                        h.userName||'-' %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Unique ID -->
+                                    <td><span style="font-family:monospace;font-size:12px;">
+                                            <%= h.uniqueId||'—' %>
+                                        </span></td>
+
+                                    <!-- Gender -->
+                                    <td>
+                                        <i class="fa fa-<%= h.gender==='Female'?'venus':'mars' %>"
+                                            style="color:<%= h.gender==='Female'?'#be185d':'#2563eb' %>;margin-right:4px;"></i>
+                                        <%= h.gender||'—' %>
+                                    </td>
+
+                                    <!-- Age -->
+                                    <td>
+                                        <%= h.age||'—' %>
+                                    </td>
+
+                                    <!-- Coin -->
+                                    <td>
+                                        <span class="hm-coin">
+                                            <span style="color:#f59e0b;">⭐</span>
+                                            <%= (h.coin||0).toLocaleString() %>
+                                        </span>
+                                    </td>
+
+                                    <!-- Country -->
+                                    <td>
+                                        <%= h.country||'—' %>
+                                    </td>
+
+                                    <!-- Social -->
+                                    <td>
+                                        <%= h.totalFollowers||0 %>
+                                    </td>
+                                    <td>
+                                        <%= h.totalFollowing||0 %>
+                                    </td>
+                                    <td>
+                                        <%= h.totalFriends||0 %>
+                                    </td>
+                                    <td>
+                                        <%= h.postCount||0 %>
+                                    </td>
+                                    <td>
+                                        <%= h.videoCount||0 %>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td>
+                                        <div style="display:flex;gap:6px;">
+                                            <a href="/admin/users/<%= h._id %>" class="hm-action-btn hm-btn-view"><i
+                                                    class="fa fa-eye"></i> View</a>
+                                            <form method="POST" action="/admin/hosts/<%= h._id %>/remove-agency"
+                                                onsubmit="return confirm('Remove this host from their agency?')"
+                                                style="margin:0;">
+                                                <button type="submit" class="hm-action-btn hm-btn-remove"><i
+                                                        class="fa fa-times"></i> Remove</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <% } %>
+    </div>
+
+    <%- include('partials/footer') %>

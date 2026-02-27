@@ -1,0 +1,36 @@
+<%- include('partials/header', { pageTitle: 'Hashtags' , page: 'hashtags' }) %>
+    <div class="card">
+        <h3>Add Hashtag</h3>
+        <form method="POST" action="/admin/hashtags/create" class="form-inline">
+            <div class="form-group"><label>Hashtag</label><input name="hashTag" required placeholder="#trending"></div>
+            <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Hashtag</th>
+                <th>Usage Count</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% hashtags.forEach(function(h) { %>
+                <tr>
+                    <td><strong>
+                            <%= h.hashTag %>
+                        </strong></td>
+                    <td>
+                        <%= h.usageCount %>
+                    </td>
+                    <td>
+                        <form method="POST" action="/admin/hashtags/<%= h._id %>/delete"
+                            onsubmit="return confirm('Delete?')">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+    <%- include('partials/footer') %>

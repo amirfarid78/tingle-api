@@ -1,0 +1,51 @@
+<%- include('partials/header', { pageTitle: 'Coin Plans' , page: 'coinPlans' }) %>
+    <div class="card">
+        <h3>Add Coin Plan</h3>
+        <form method="POST" action="/admin/coin-plans/create" class="form-inline">
+            <div class="form-group"><label>Coins</label><input name="coin" type="number" required placeholder="1000">
+            </div>
+            <div class="form-group"><label>Amount ($)</label><input name="amount" type="number" step="0.01" required
+                    placeholder="9.99"></div>
+            <div class="form-group"><label>Product Key</label><input name="productKey"
+                    placeholder="com.tingle.coins_1000"></div>
+            <div class="form-group checkbox-group"><input type="checkbox" name="isPopular" id="isPopular"><label
+                    for="isPopular">Popular</label></div>
+            <button class="btn btn-primary" type="submit">Add Plan</button>
+        </form>
+    </div>
+    <div class="card">
+        <h3>Coin Plans</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Coins</th>
+                    <th>Price</th>
+                    <th>Product Key</th>
+                    <th>Popular</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% plans.forEach(function(p) { %>
+                    <tr>
+                        <td><strong>
+                                <%= p.coin %>
+                            </strong> coins</td>
+                        <td>$<%= p.amount %>
+                        </td>
+                        <td>
+                            <%= p.productKey || '-' %>
+                        </td>
+                        <td><%- p.isPopular ? '<span class="badge badge-yellow">Popular</span>' : '-' %></td>
+                        <td>
+                            <form method="POST" action="/admin/coin-plans/<%= p._id %>/delete"
+                                onsubmit="return confirm('Delete?')">
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </div>
+    <%- include('partials/footer') %>

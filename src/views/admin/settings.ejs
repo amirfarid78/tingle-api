@@ -1,0 +1,123 @@
+<%- include('partials/header', { pageTitle: 'Settings' , page: 'settings' }) %>
+        <form method="POST" action="/admin/settings/update">
+                <div class="card">
+                        <h3>💳 Payment Gateways</h3>
+                        <div class="form-inline" style="gap:24px;flex-wrap:wrap">
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="isGooglePlayEnabled"
+                                                <%=settings.isGooglePlayEnabled ? 'checked' : '' %> id="gp">
+                                        <label for="gp">Google Play</label>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="isStripeEnabled" <%=settings.isStripeEnabled
+                                                ? 'checked' : '' %> id="st">
+                                        <label for="st">Stripe</label>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="isRazorpayEnabled" <%=settings.isRazorpayEnabled
+                                                ? 'checked' : '' %> id="rz">
+                                        <label for="rz">Razorpay</label>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="isFlutterwaveEnabled"
+                                                <%=settings.isFlutterwaveEnabled ? 'checked' : '' %> id="fw">
+                                        <label for="fw">Flutterwave</label>
+                                </div>
+                        </div>
+                        <div class="form-inline" style="margin-top:12px">
+                                <div class="form-group"><label>Stripe Publishable Key</label><input
+                                                name="stripePublishableKey"
+                                                value="<%= settings.stripePublishableKey || '' %>"></div>
+                                <div class="form-group"><label>Stripe Secret Key</label><input name="stripeSecretKey"
+                                                value="<%= settings.stripeSecretKey || '' %>"></div>
+                        </div>
+                        <div class="form-inline" style="margin-top:12px">
+                                <div class="form-group"><label>Razorpay Key ID</label><input name="razorPayId"
+                                                value="<%= settings.razorPayId || '' %>"></div>
+                                <div class="form-group"><label>Razorpay Secret Key</label><input name="razorSecretKey"
+                                                value="<%= settings.razorSecretKey || '' %>"></div>
+                        </div>
+                </div>
+
+                <div class="card">
+                        <h3>⚙️ App Configuration</h3>
+                        <div class="form-inline">
+                                <div class="form-group"><label>Login Bonus (coins)</label><input name="loginBonus"
+                                                type="number" value="<%= settings.loginBonus || 100 %>"></div>
+                                <div class="form-group"><label>Private Call Rate (coins/min)</label><input
+                                                name="privateCallRate" type="number"
+                                                value="<%= settings.privateCallRate || 20 %>"></div>
+                                <div class="form-group"><label>Shorts Duration (sec)</label><input
+                                                name="durationOfShorts" type="number"
+                                                value="<%= settings.durationOfShorts || 30 %>"></div>
+                        </div>
+                        <div class="form-inline" style="margin-top:12px">
+                                <div class="form-group"><label>Min Coins to Cash Out</label><input
+                                                name="minCoinsToCashOut" type="number"
+                                                value="<%= settings.minCoinsToCashOut || 500 %>"></div>
+                                <div class="form-group"><label>Min Coins for Payout</label><input
+                                                name="minCoinsForPayout" type="number"
+                                                value="<%= settings.minCoinsForPayout || 1000 %>"></div>
+                                <div class="form-group"><label>PK End Time (sec)</label><input name="pkEndTime"
+                                                type="number" value="<%= settings.pkEndTime || 60 %>"></div>
+                        </div>
+                </div>
+
+                <div class="card">
+                        <h3>📄 Policies</h3>
+                        <div class="form-inline">
+                                <div class="form-group" style="flex:1"><label>Privacy Policy URL</label><input
+                                                name="privacyPolicyLink"
+                                                value="<%= settings.privacyPolicyLink || '' %>"></div>
+                                <div class="form-group" style="flex:1"><label>Terms of Use URL</label><input
+                                                name="termsOfUsePolicyLink"
+                                                value="<%= settings.termsOfUsePolicyLink || '' %>"></div>
+                        </div>
+                </div>
+
+                <div class="card">
+                        <h3>🎨 Effects & Watermark</h3>
+                        <div class="form-inline">
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="shortsEffectEnabled"
+                                                <%=settings.shortsEffectEnabled ? 'checked' : '' %> id="se">
+                                        <label for="se">Shorts Effects</label>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="watermarkEnabled" <%=settings.watermarkEnabled
+                                                ? 'checked' : '' %> id="wm">
+                                        <label for="wm">Watermark</label>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                        <input type="checkbox" name="isDummyData" <%=settings.isDummyData ? 'checked'
+                                                : '' %> id="dd">
+                                        <label for="dd">Show Dummy Data</label>
+                                </div>
+                        </div>
+                        <div class="form-inline" style="margin-top:12px">
+                                <div class="form-group"><label>Watermark Icon URL</label><input name="watermarkIcon"
+                                                value="<%= settings.watermarkIcon || '' %>"></div>
+                        </div>
+                </div>
+
+                <div class="card">
+                        <h3>💱 Currency</h3>
+                        <div class="form-inline">
+                                <div class="form-group"><label>Currency Name</label><input name="currency.name"
+                                                value="<%= settings.currency ? settings.currency.name : 'Indian Rupee' %>">
+                                </div>
+                                <div class="form-group"><label>Symbol</label><input name="currency.symbol"
+                                                value="<%= settings.currency ? settings.currency.symbol : '₹' %>"></div>
+                                <div class="form-group"><label>Country Code</label><input name="currency.countryCode"
+                                                value="<%= settings.currency ? settings.currency.countryCode : 'IN' %>">
+                                </div>
+                                <div class="form-group"><label>Currency Code</label><input name="currency.currencyCode"
+                                                value="<%= settings.currency ? settings.currency.currencyCode : 'INR' %>">
+                                </div>
+                        </div>
+                </div>
+
+                <button class="btn btn-primary" type="submit" style="padding:14px 40px;font-size:16px">💾 Save
+                        Settings</button>
+        </form>
+        <%- include('partials/footer') %>

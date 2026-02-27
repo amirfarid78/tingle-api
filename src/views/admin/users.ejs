@@ -1,0 +1,332 @@
+<%- include('partials/header', { pageTitle: 'Users' , page: 'users' }) %>
+
+    <div class="dashboard-header">
+        <div>
+            <h1>User Management</h1>
+            <p>Manage and monitor user accounts</p>
+        </div>
+    </div>
+
+    <!-- Grid Statistics Cards -->
+    <div class="um-stats-grid">
+        <div class="um-stat-card">
+            <div class="um-stat-info">
+                <h4>Total users</h4>
+                <div class="um-value">
+                    <%= stats.totalUsersCount %>
+                </div>
+            </div>
+            <div class="um-stat-icon icon-green"><i class="fa fa-users"></i></div>
+        </div>
+        <div class="um-stat-card">
+            <div class="um-stat-info">
+                <h4>Males</h4>
+                <div class="um-value">
+                    <%= stats.malesCount %>
+                </div>
+            </div>
+            <div class="um-stat-icon icon-blue"><i class="fa fa-male"></i></div>
+        </div>
+        <div class="um-stat-card">
+            <div class="um-stat-info">
+                <h4>Females</h4>
+                <div class="um-value">
+                    <%= stats.femalesCount %>
+                </div>
+            </div>
+            <div class="um-stat-icon icon-red"><i class="fa fa-female"></i></div>
+        </div>
+        <div class="um-stat-card">
+            <div class="um-stat-info">
+                <h4>VIP users</h4>
+                <div class="um-value">
+                    <%= stats.vipUsersCount %>
+                </div>
+            </div>
+            <div class="um-stat-icon icon-orange"><i class="fa fa-crown"></i></div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="card" style="padding: 24px;">
+
+        <form method="GET" action="/admin/users">
+            <h4 style="margin-top: 0; margin-bottom: 16px; font-weight: 500; color: var(--text-muted);">Filters</h4>
+            <div class="filter-bar">
+                <!-- Filter: User Type -->
+                <select name="userType" onchange="this.form.submit()">
+                    <option value="">User Type</option>
+                    <option value="Real Users" <%=filterUserType==='Real Users' ? 'selected' : '' %>>Real Users</option>
+                    <option value="Fake Users" <%=filterUserType==='Fake Users' ? 'selected' : '' %>>Fake Users</option>
+                </select>
+
+                <!-- Filter: Status -->
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">Status</option>
+                    <option value="Active" <%=filterStatus==='Active' ? 'selected' : '' %>>Active</option>
+                    <option value="Blocked" <%=filterStatus==='Blocked' ? 'selected' : '' %>>Blocked</option>
+                </select>
+
+                <!-- Filter: Role -->
+                <select name="role" onchange="this.form.submit()">
+                    <option value="">Role</option>
+                    <option value="User" <%=filterRole==='User' ? 'selected' : '' %>>User</option>
+                    <option value="Admin" <%=filterRole==='Admin' ? 'selected' : '' %>>Admin</option>
+                    <option value="Agency" <%=filterRole==='Agency' ? 'selected' : '' %>>Agency</option>
+                </select>
+
+                <button type="button" class="btn"
+                    style="background:var(--bg-color); border:1px solid var(--border-color); color:var(--text-muted);"
+                    onclick="window.location.href='/admin/users'"><i class="fa fa-times"></i></button>
+
+                <!-- Spacer -->
+                <div style="flex-grow: 1;"></div>
+
+                <!-- Search -->
+                <div class="search-wrapper" style="max-width: 300px; display: flex;">
+                    <input type="text" name="search" placeholder="Search User..." value="<%= search %>"
+                        style="padding: 10px 16px; border: 1px solid var(--border-color); border-right: none; border-radius: var(--border-radius) 0 0 var(--border-radius); outline: none;">
+                    <button type="submit" class="btn"
+                        style="background: white; border: 1px solid var(--border-color); border-left: none; border-radius: 0 var(--border-radius) var(--border-radius) 0; color: var(--primary);"><i
+                            class="fa fa-search"></i></button>
+                </div>
+
+            </div>
+        </form>
+
+        <div style="overflow-x: auto; padding-bottom: 20px;">
+            <table style="min-width: 1200px; border-collapse: separate; border-spacing: 0;">
+                <thead style="background: white;">
+                    <tr>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            User</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Role</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            User Type</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Coin</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Status</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            UniqueId</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Gender</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Age</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Country</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Followers</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Following</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Friends</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Posts</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Videos</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Block</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Created At</th>
+                        <th
+                            style="padding: 16px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                            Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(function(u) { %>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+
+                            <!-- User Col -->
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px;">
+                                <img src="<%= u.image || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.name || 'User')+'&background=random' %>"
+                                    onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(u.name || 'User')+'&background=random'"
+                                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                <div>
+                                    <div style="font-weight: 500; color: var(--text-dark);">
+                                        <%= u.name || 'N/A' %>
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">@<%= u.userName || '-' %>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Role Col -->
+                            <td style="padding: 16px; border-top: 1px solid var(--border-color);">
+                                <% if(u.role===1) { %>
+                                    <div class="badge-role-admin"><i class="fa fa-shield"></i> Admin</div>
+                                    <% } else if(u.role===2) { %>
+                                        <div class="badge-role-agency"><i class="fa fa-building"></i> Agency</div>
+                                        <% } else { %>
+                                            <div class="badge-role-user"><i class="fa fa-user"></i> User</div>
+                                            <% } %>
+                            </td>
+
+                            <!-- User Type -->
+                            <td style="padding: 16px; border-top: 1px solid var(--border-color);">
+                                <div class="badge-type-normal">
+                                    <%= u.isFake ? 'Fake' : 'Normal' %>
+                                </div>
+                            </td>
+
+                            <!-- Coin -->
+                            <td style="padding: 16px; border-top: 1px solid var(--border-color);">
+                                <div class="text-coin"><i class="fa fa-star"></i>
+                                    <%= u.coin || 0 %>
+                                </div>
+                            </td>
+
+                            <!-- Status -->
+                            <td style="padding: 16px; border-top: 1px solid var(--border-color);">
+                                <div class="<%= u.isOnline ? 'badge-status-online' : 'badge-status-offline' %>">
+                                    <%= u.isOnline ? 'Online' : 'Offline' %>
+                                </div>
+                            </td>
+
+                            <!-- UniqueID -->
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.uniqueId || '-' %>
+                            </td>
+
+                            <!-- Gender -->
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <i class="fa <%= u.gender === 'Female' ? 'fa-venus' : 'fa-mars' %>"
+                                    style="margin-right:4px;"></i>
+                                <%= u.gender || '-' %>
+                            </td>
+
+                            <!-- Age, Country, Followers, etc -->
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.age || '-' %>
+                            </td>
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.country || '-' %>
+                            </td>
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.totalFollowers || 0 %>
+                            </td>
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.totalFollowing || 0 %>
+                            </td>
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.totalFriends || 0 %>
+                            </td>
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.totalPosts || 0 %>
+                            </td>
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                                <%= u.totalVideos || 0 %>
+                            </td>
+
+                            <!-- Block Toggle -->
+                            <td style="padding: 16px; border-top: 1px solid var(--border-color);">
+                                <form method="POST" action="/admin/users/<%= u._id %>/block" style="margin:0;">
+                                    <label class="switch"
+                                        style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                                        <input type="checkbox" onchange="this.form.submit()" <%=u.isBlock ? 'checked'
+                                            : '' %> style="opacity: 0; width: 0; height: 0;">
+                                        <span
+                                            style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: <%= u.isBlock ? '#ef4444' : '#e2e8f0' %>; transition: .4s; border-radius: 24px;">
+                                            <span
+                                                style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; transform: <%= u.isBlock ? 'translateX(20px)' : 'translateX(0)' %>;"></span>
+                                        </span>
+                                    </label>
+                                </form>
+                            </td>
+
+                            <!-- Created At -->
+                            <td
+                                style="padding: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px; white-space: nowrap;">
+                                <%= new Date(u.createdAt).toLocaleString('en-US', { month: 'long' , day: 'numeric' ,
+                                    year: 'numeric' , hour: 'numeric' , minute: 'numeric' , second: 'numeric' , hour12:
+                                    true }) %>
+                            </td>
+
+                            <!-- Actions -->
+                            <td style="padding: 16px; border-top: 1px solid var(--border-color);">
+                                <div class="actions-cell">
+                                    <a href="/admin/users/<%= u._id %>" title="View Details"><i
+                                            class="fa fa-info-circle"></i></a>
+                                    <form method="POST" action="/admin/users/<%= u._id %>/delete"
+                                        onsubmit="return confirm('Delete this user?')" style="margin:0;">
+                                        <button type="submit" title="Delete User"><i class="fa fa-trash-o"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% if(users.length===0) { %>
+                                <tr>
+                                    <td colspan="17"
+                                        style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                        No users found.
+                                    </td>
+                                </tr>
+                                <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Footer -->
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+            <div style="color: var(--text-muted); font-size: 14px;">
+                Showing <%= (page - 1) * 20 + 1 %> to <%= Math.min(page * 20, total) %> of <%= total %> entries
+            </div>
+
+            <% if (pages> 1) { %>
+                <div class="pagination" style="display: flex; gap: 4px;">
+                    <a href="/admin/users?page=1&search=<%= search %>"
+                        style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); text-decoration: none; background: #f8fafc;"><i
+                            class="fa fa-step-backward" style="font-size: 10px;"></i></a>
+                    <a href="/admin/users?page=<%= Math.max(1, page - 1) %>&search=<%= search %>"
+                        style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); text-decoration: none; background: #f8fafc;"><i
+                            class="fa fa-chevron-left" style="font-size: 10px;"></i></a>
+
+                    <% for(let i=Math.max(1, page - 2); i <=Math.min(pages, page + 2); i++) { %>
+                        <a href="/admin/users?page=<%= i %>&search=<%= search %>"
+                            style="padding: 8px 14px; border: 1px solid <%= page === i ? 'var(--primary)' : 'var(--border-color)' %>; border-radius: 4px; color: <%= page === i ? 'white' : 'var(--text-muted)' %>; background: <%= page === i ? 'var(--primary)' : '#f8fafc' %>; text-decoration: none;">
+                            <%= i %>
+                        </a>
+                        <% } %>
+
+                            <a href="/admin/users?page=<%= Math.min(pages, page + 1) %>&search=<%= search %>"
+                                style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); text-decoration: none; background: #f8fafc;"><i
+                                    class="fa fa-chevron-right" style="font-size: 10px;"></i></a>
+                            <a href="/admin/users?page=<%= pages %>&search=<%= search %>"
+                                style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); text-decoration: none; background: #f8fafc;"><i
+                                    class="fa fa-step-forward" style="font-size: 10px;"></i></a>
+                </div>
+                <% } %>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>

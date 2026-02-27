@@ -1,0 +1,48 @@
+<%- include('partials/header', { pageTitle: 'Songs' , page: 'songs' }) %>
+    <div class="card">
+        <h3>Add Song</h3>
+        <form method="POST" action="/admin/songs/create" class="form-inline">
+            <div class="form-group"><label>Title</label><input name="songTitle" required></div>
+            <div class="form-group"><label>Singer</label><input name="singerName" required></div>
+            <div class="form-group"><label>Song Link URL</label><input name="songLink" placeholder="https://..."></div>
+            <div class="form-group"><label>Image URL</label><input name="songImage" placeholder="https://..."></div>
+            <div class="form-group"><label>Duration (sec)</label><input name="duration" type="number" value="30"></div>
+            <button class="btn btn-primary" type="submit">Add Song</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Singer</th>
+                <th>Duration</th>
+                <th>Used</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% songs.forEach(function(s) { %>
+                <tr>
+                    <td>
+                        <%= s.songTitle %>
+                    </td>
+                    <td>
+                        <%= s.singerName || '-' %>
+                    </td>
+                    <td>
+                        <%= s.duration || 0 %>s
+                    </td>
+                    <td>
+                        <%= s.usageCount || 0 %> times
+                    </td>
+                    <td>
+                        <form method="POST" action="/admin/songs/<%= s._id %>/delete"
+                            onsubmit="return confirm('Delete?')">
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+    <%- include('partials/footer') %>

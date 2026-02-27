@@ -1,0 +1,101 @@
+<%- include('partials/header', { pageTitle: 'Gifts' , page: 'gifts' }) %>
+    <div class="card">
+        <h3>Add Gift Category</h3>
+        <form method="POST" action="/admin/gifts/category/create" class="form-inline">
+            <div class="form-group"><label>Name</label><input name="name" required placeholder="Category name"></div>
+            <div class="form-group"><label>Image URL</label><input name="image" placeholder="https://..."></div>
+            <button class="btn btn-primary" type="submit">Add Category</button>
+        </form>
+    </div>
+    <div class="card">
+        <h3>Categories</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% categories.forEach(function(c) { %>
+                    <tr>
+                        <td>
+                            <%= c.name %>
+                        </td>
+                        <td>
+                            <form method="POST" action="/admin/gifts/category/<%= c._id %>/delete"
+                                onsubmit="return confirm('Delete category and all its gifts?')">
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </div>
+    <div class="card">
+        <h3>Add Gift</h3>
+        <form method="POST" action="/admin/gifts/create" class="form-inline">
+            <div class="form-group">
+                <label>Category</label>
+                <select name="giftCategoryId" required>
+                    <% categories.forEach(function(c) { %>
+                        <option value="<%= c._id %>">
+                            <%= c.name %>
+                        </option>
+                        <% }) %>
+                </select>
+            </div>
+            <div class="form-group"><label>Gift Name</label><input name="name" required></div>
+            <div class="form-group"><label>Coins</label><input name="coin" type="number" required></div>
+            <div class="form-group">
+                <label>Type</label>
+                <select name="giftType">
+                    <option value="static">Static</option>
+                    <option value="animated">Animated</option>
+                    <option value="svga">SVGA</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Image URL</label><input name="image" placeholder="https://..."></div>
+            <button class="btn btn-primary" type="submit">Add Gift</button>
+        </form>
+    </div>
+    <div class="card">
+        <h3>All Gifts</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Gift</th>
+                    <th>Category</th>
+                    <th>Coins</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% gifts.forEach(function(g) { %>
+                    <tr>
+                        <td>
+                            <%= g.name %>
+                        </td>
+                        <td>
+                            <%= g.giftCategoryId ? g.giftCategoryId.name : '-' %>
+                        </td>
+                        <td>
+                            <%= g.coin %>
+                        </td>
+                        <td><span class="badge badge-blue">
+                                <%= g.giftType %>
+                            </span></td>
+                        <td>
+                            <form method="POST" action="/admin/gifts/<%= g._id %>/delete"
+                                onsubmit="return confirm('Delete?')">
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </div>
+    <%- include('partials/footer') %>
