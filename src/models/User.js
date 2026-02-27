@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema({
     isVerified: { type: Boolean, default: false },
     isOnline: { type: Boolean, default: false },
     isBusy: { type: Boolean, default: false },
+    password: { type: String, select: false },
     // VIP System
     isVIP: { type: Boolean, default: false },
     vipPlanId: { type: mongoose.Schema.Types.ObjectId, ref: 'VipPlan' },
