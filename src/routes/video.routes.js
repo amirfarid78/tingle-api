@@ -119,6 +119,50 @@ router.post('/:videoId/like', auth, async (req, res, next) => {
         }
     } catch (error) { next(error); }
 });
+// POST /api/videos/:videoId/comment
+router.post('/:videoId/comment', auth, async (req, res, next) => {
+    try {
+        const loginUser = await User.findOne({ firebaseUid: req.uid });
+        const { commentText } = req.body;
+        if (!commentText) return res.status(400).json({ status: false, message: 'Comment text required' });
+
+        const comment = await Comment.create({
+            userId: loginUser._id, videoId: req.params.videoId, commentText, type: 'video',
+        });
+        await Video.findByIdAndUpdate(req.params.videoId, { $inc: { totalComments: 1 } });
+
+        res.json({
+            status: true, message: 'Comment added',
+            comment: {
+                _id: comment._id, commentText: comment.commentText,
+                userId: loginUser._id, name: loginUser.name, userName: loginUser.userName,
+                image: loginUser.image, isVerified: loginUser.isVerified,
+                createdAt: comment.createdAt,
+            },
+        });
+    } catch (error) { next(error); }
+});
+
+// GET /api/videos/:videoId/comments
+router.get('/:videoId/comments', auth, async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.start) || 0;
+        const limit = parseInt(req.query.limit) || 20;
+
+        const comments = await Comment.find({ videoId: req.params.videoId, type: 'video' })
+            .sort({ createdAt: -1 }).skip(page * limit).limit(limit).populate('userId', 'name userName image isVerified isProfilePicBanned').lean();
+
+        const formatted = comments.map(c => ({
+            _id: c._id, commentText: c.commentText,
+            userId: c.userId?._id, name: c.userId?.name, userName: c.userId?.userName,
+            image: c.userId?.image, isVerified: c.userId?.isVerified,
+            isProfilePicBanned: c.userId?.isProfilePicBanned,
+            createdAt: c.createdAt, time: getTimeAgo(c.createdAt),
+        }));
+
+        res.json({ status: true, message: 'Comments fetched', data: formatted });
+    } catch (error) { next(error); }
+});
 
 // DELETE /api/videos/:videoId
 router.delete('/:videoId', auth, async (req, res, next) => {
