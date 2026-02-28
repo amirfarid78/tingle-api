@@ -123,7 +123,7 @@ router.post('/send', auth, upload.single('image'), async (req, res, next) => {
         }
 
         let imageUrl = '';
-        if (req.file) imageUrl = await uploadToCloudinary(req.file.path, 'tingle/chat');
+        if (req.file) imageUrl = await uploadToCloudinary(req.file.buffer, 'tingle/chat', 'image');
 
         const msg = await Message.create({
             chatTopicId: topic._id, senderId: loginUser._id, receiverId,

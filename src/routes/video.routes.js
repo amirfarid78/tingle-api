@@ -60,8 +60,8 @@ router.post('/upload', auth, upload.fields([{ name: 'videoUrl', maxCount: 1 }, {
         const { caption, songId, videoTime, hashTag } = req.body;
 
         let videoUrl = '', videoImage = '';
-        if (req.files?.videoUrl?.[0]) videoUrl = await uploadToCloudinary(req.files.videoUrl[0].path, 'tingle/videos', 'video');
-        if (req.files?.videoImage?.[0]) videoImage = await uploadToCloudinary(req.files.videoImage[0].path, 'tingle/thumbnails');
+        if (req.files?.videoUrl?.[0]) videoUrl = await uploadToCloudinary(req.files.videoUrl[0].buffer, 'tingle/videos', 'video');
+        if (req.files?.videoImage?.[0]) videoImage = await uploadToCloudinary(req.files.videoImage[0].buffer, 'tingle/thumbnails', 'image');
 
         const hashTags = hashTag ? (Array.isArray(hashTag) ? hashTag : JSON.parse(hashTag)) : [];
         const hashTagIds = [];

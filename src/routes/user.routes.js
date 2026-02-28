@@ -114,7 +114,7 @@ router.put('/profile/edit', auth, (req, res, next) => {
             // Upload image only if one was provided and no upload error
             if (req.file && !uploadErr) {
                 try {
-                    const imageUrl = await uploadToCloudinary(req.file.path, 'tingle/profiles');
+                    const imageUrl = await uploadToCloudinary(req.file.buffer, 'tingle/profiles', 'image');
                     user.image = imageUrl;
                 } catch (imgErr) {
                     console.warn('Image upload failed (non-fatal):', imgErr.message);
@@ -154,7 +154,7 @@ router.post('/fill-profile', auth, upload.single('image'), async (req, res, next
         user.bio = bio || user.bio;
 
         if (req.file) {
-            user.image = await uploadToCloudinary(req.file.path, 'tingle/profiles');
+            user.image = await uploadToCloudinary(req.file.buffer, 'tingle/profiles', 'image');
         }
 
         await user.save();

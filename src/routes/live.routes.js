@@ -125,7 +125,7 @@ router.post('/audio/create', auth, upload.single('roomImage'), async (req, res, 
         // Upload roomImage if present
         let finalRoomImage = user.image || '';
         if (req.file) {
-            finalRoomImage = await uploadToCloudinary(req.file.path, 'tingle/rooms');
+            finalRoomImage = await uploadToCloudinary(req.file.buffer, 'tingle/rooms', 'image');
         } else if (req.body.roomImage) {
             finalRoomImage = req.body.roomImage;
         }

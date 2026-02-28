@@ -12,7 +12,7 @@ router.post('/submit', auth, upload.single('image'), async (req, res, next) => {
         if (!complaint || !contact) return res.status(400).json({ status: false, message: 'Complaint and contact required' });
 
         let imageUrl = '';
-        if (req.file) imageUrl = await uploadToCloudinary(req.file.path, 'tingle/help');
+        if (req.file) imageUrl = await uploadToCloudinary(req.file.buffer, 'tingle/help', 'image');
 
         await Help.create({ userId: loginUser._id, complaint, contact, image: imageUrl });
 
