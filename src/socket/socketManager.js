@@ -139,19 +139,30 @@ function initSocket(server) {
         // ─── Live Streaming ─────────────────────────────────
         socket.on('joinLive', async ({ liveHistoryId, userId }) => {
             socket.join(`live_${liveHistoryId}`);
-            await LiveHistory.findByIdAndUpdate(liveHistoryId, {
-                $inc: { view: 1 },
-                $addToSet: { viewers: userId },
-            });
+            // liveHistoryId may be a string (audio rooms) — skip DB safely
+            try {
+                const mongoose = require('mongoose');
+                if (mongoose.Types.ObjectId.isValid(liveHistoryId)) {
+                    await LiveHistory.findByIdAndUpdate(liveHistoryId, {
+                        $inc: { view: 1 },
+                        $addToSet: { viewers: userId },
+                    });
+                }
+            } catch (e) { /* Non-fatal: audio room IDs are not ObjectIds */ }
             io.to(`live_${liveHistoryId}`).emit('viewerJoined', { userId, liveHistoryId });
         });
 
         socket.on('leaveLive', async ({ liveHistoryId, userId }) => {
             socket.leave(`live_${liveHistoryId}`);
-            await LiveHistory.findByIdAndUpdate(liveHistoryId, {
-                $inc: { view: -1 },
-                $pull: { viewers: userId },
-            });
+            try {
+                const mongoose = require('mongoose');
+                if (mongoose.Types.ObjectId.isValid(liveHistoryId)) {
+                    await LiveHistory.findByIdAndUpdate(liveHistoryId, {
+                        $inc: { view: -1 },
+                        $pull: { viewers: userId },
+                    });
+                }
+            } catch (e) { /* Non-fatal */ }
             io.to(`live_${liveHistoryId}`).emit('viewerLeft', { userId, liveHistoryId });
         });
 

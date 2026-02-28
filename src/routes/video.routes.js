@@ -57,7 +57,7 @@ router.get('/', auth, async (req, res, next) => {
 router.post('/upload', auth, upload.fields([{ name: 'videoUrl', maxCount: 1 }, { name: 'videoImage', maxCount: 1 }]), async (req, res, next) => {
     try {
         const loginUser = await User.findOne({ firebaseUid: req.uid });
-        const { caption, songId, videoTime, hashTag } = req.body;
+        const { caption, songId, videoTime, hashTag, mentionedUserIds } = req.body;
 
         let videoUrl = '', videoImage = '';
         if (req.files?.videoUrl?.[0]) videoUrl = await uploadToCloudinary(req.files.videoUrl[0].buffer, 'tingle/videos', 'video');
@@ -77,6 +77,7 @@ router.post('/upload', auth, upload.fields([{ name: 'videoUrl', maxCount: 1 }, {
         const video = await Video.create({
             userId: loginUser._id, songId, caption, videoTime: parseInt(videoTime) || 0,
             videoImage, videoUrl, hashTag: hashTags, hashTagId: hashTagIds,
+            mentionedUserIds: mentionedUserIds ? mentionedUserIds.split(',').filter(Boolean) : [],
         });
 
         res.json({ status: true, message: 'Video uploaded', data: await formatVideo(video.toObject(), loginUser._id) });
