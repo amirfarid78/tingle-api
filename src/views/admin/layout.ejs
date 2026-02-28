@@ -1,62 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tingle Admin — <%- typeof pageTitle !== 'undefined' ? pageTitle : 'Dashboard' %></title>
+  <title>Snap Live Admin — <%- typeof pageTitle !=='undefined' ? pageTitle : 'Dashboard' %></title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, sans-serif; background: #0f0f23; color: #e0e0e8; display: flex; min-height: 100vh; }
-    a { color: #818cf8; text-decoration: none; }
-    .sidebar { width: 260px; background: #1a1a2e; padding: 24px 0; border-right: 1px solid #2a2a3e; position: fixed; height: 100vh; overflow-y: auto; }
-    .sidebar .logo { padding: 0 24px 24px; font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #818cf8, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .sidebar .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: #8888a4; font-size: 14px; transition: all 0.2s; cursor: pointer; }
-    .sidebar .nav-item:hover, .sidebar .nav-item.active { background: #252540; color: #818cf8; border-right: 3px solid #818cf8; }
-    .sidebar .nav-item span.icon { font-size: 18px; width: 24px; text-align: center; }
-    .main { margin-left: 260px; flex: 1; padding: 32px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-    .header h1 { font-size: 28px; font-weight: 700; }
-    .header .logout { padding: 8px 20px; background: #ef4444; color: white; border-radius: 8px; font-size: 13px; }
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
-    .stat-card { background: #1a1a2e; border-radius: 12px; padding: 24px; border: 1px solid #2a2a3e; }
-    .stat-card .value { font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #818cf8, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .stat-card .label { font-size: 13px; color: #8888a4; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; background: #1a1a2e; border-radius: 12px; overflow: hidden; }
-    th { background: #252540; padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; color: #8888a4; letter-spacing: 1px; }
-    td { padding: 12px 16px; border-top: 1px solid #2a2a3e; font-size: 14px; }
-    tr:hover { background: #252540; }
-    .btn { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; }
-    .btn-primary { background: #818cf8; color: white; }
-    .btn-danger { background: #ef4444; color: white; }
-    .btn-success { background: #10b981; color: white; }
-    .btn-warning { background: #f59e0b; color: #111; }
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-    .badge-green { background: #10b98133; color: #10b981; }
-    .badge-red { background: #ef444433; color: #ef4444; }
-    .badge-yellow { background: #f59e0b33; color: #f59e0b; }
-    .badge-blue { background: #818cf833; color: #818cf8; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: #8888a4; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; background: #252540; border: 1px solid #2a2a3e; border-radius: 8px; color: #e0e0e8; font-size: 14px; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #818cf8; }
-    .form-inline { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; }
-    .card { background: #1a1a2e; border-radius: 12px; padding: 24px; border: 1px solid #2a2a3e; margin-bottom: 24px; }
-    .card h3 { margin-bottom: 16px; font-size: 16px; }
-    .pagination { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
-    .pagination a { padding: 8px 14px; background: #252540; border-radius: 6px; color: #8888a4; }
-    .pagination a.active { background: #818cf8; color: white; }
-    .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #252540; }
-    .search-box { display: flex; gap: 8px; margin-bottom: 16px; }
-    .search-box input { flex: 1; padding: 10px 14px; background: #252540; border: 1px solid #2a2a3e; border-radius: 8px; color: #e0e0e8; }
-    .checkbox-group { display: flex; align-items: center; gap: 8px; }
-    .checkbox-group input[type=checkbox] { width: 18px; height: 18px; }
-    .section-divider { border-top: 1px solid #2a2a3e; margin: 24px 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0f0f23;
+      color: #e0e0e8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    a {
+      color: #818cf8;
+      text-decoration: none;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #1a1a2e;
+      padding: 24px 0;
+      border-right: 1px solid #2a2a3e;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar .logo {
+      padding: 0 24px 24px;
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      color: #8888a4;
+      font-size: 14px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .sidebar .nav-item:hover,
+    .sidebar .nav-item.active {
+      background: #252540;
+      color: #818cf8;
+      border-right: 3px solid #818cf8;
+    }
+
+    .sidebar .nav-item span.icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .main {
+      margin-left: 260px;
+      flex: 1;
+      padding: 32px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .header .logout {
+      padding: 8px 20px;
+      background: #ef4444;
+      color: white;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #2a2a3e;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-card .label {
+      font-size: 13px;
+      color: #8888a4;
+      margin-top: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1a1a2e;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #252540;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #8888a4;
+      letter-spacing: 1px;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-top: 1px solid #2a2a3e;
+      font-size: 14px;
+    }
+
+    tr:hover {
+      background: #252540;
+    }
+
+    .btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: #818cf8;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: #111;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-green {
+      background: #10b98133;
+      color: #10b981;
+    }
+
+    .badge-red {
+      background: #ef444433;
+      color: #ef4444;
+    }
+
+    .badge-yellow {
+      background: #f59e0b33;
+      color: #f59e0b;
+    }
+
+    .badge-blue {
+      background: #818cf833;
+      color: #818cf8;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #8888a4;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      background: #252540;
+      border: 1px solid #2a2a3e;
+      border-radius: 8px;
+      color: #e0e0e8;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #818cf8;
+    }
+
+    .form-inline {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #2a2a3e;
+      margin-bottom: 24px;
+    }
+
+    .card h3 {
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
+    .pagination a {
+      padding: 8px 14px;
+      background: #252540;
+      border-radius: 6px;
+      color: #8888a4;
+    }
+
+    .pagination a.active {
+      background: #818cf8;
+      color: white;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #252540;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 10px 14px;
+      background: #252540;
+      border: 1px solid #2a2a3e;
+      border-radius: 8px;
+      color: #e0e0e8;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .section-divider {
+      border-top: 1px solid #2a2a3e;
+      margin: 24px 0;
+    }
   </style>
 </head>
+
 <body>
   <div class="sidebar">
-    <div class="logo">✨ Tingle Admin</div>
-    <a href="/admin" class="nav-item <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>"><span class="icon">📊</span> Dashboard</a>
+    <div class="logo">✨ Snap Live Admin</div>
+    <a href="/admin" class="nav-item <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>"><span
+        class="icon">📊</span> Dashboard</a>
     <a href="/admin/users" class="nav-item"><span class="icon">👥</span> Users</a>
     <a href="/admin/posts" class="nav-item"><span class="icon">📱</span> Posts</a>
     <a href="/admin/videos" class="nav-item"><span class="icon">🎬</span> Videos</a>
@@ -73,10 +337,11 @@
   </div>
   <div class="main">
     <div class="header">
-      <h1><%- typeof pageTitle !== 'undefined' ? pageTitle : 'Dashboard' %></h1>
+      <h1><%- typeof pageTitle !=='undefined' ? pageTitle : 'Dashboard' %></h1>
       <a href="/admin/logout" class="logout">Logout</a>
     </div>
     <%- body %>
   </div>
 </body>
+
 </html>
