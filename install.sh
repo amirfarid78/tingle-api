@@ -50,12 +50,7 @@ echo "======================================================"
 echo "      Step 3: Database and Environment Setup          "
 echo "======================================================"
 
-if [ ! -f .env ]; then
-    echo "[*] Copying .env.example to .env..."
-    cp .env.example .env
-else
-    echo "[*] .env file already exists. Updating configurations..."
-fi
+echo "[*] Generating .env configuration file..."
 
 # Prompt for Database
 read -p "Enter your MongoDB Connection String [mongodb://localhost:27017/tingle]: " MONGODB_URI
@@ -69,12 +64,43 @@ SERVER_PORT=${SERVER_PORT:-3000}
 read -p "Enter your Base URL (e.g. https://api.mydomain.com) [http://localhost:3000]: " BASE_URL
 BASE_URL=${BASE_URL:-http://localhost:3000}
 
-# Update the .env file
-# Works cross-platform for Linux/Windows Git Bash
-sed -i.bak -e "s|^MONGODB_URI=.*|MONGODB_URI=$MONGODB_URI|g" .env
-sed -i.bak -e "s|^PORT=.*|PORT=$SERVER_PORT|g" .env
-sed -i.bak -e "s|^BASE_URL=.*|BASE_URL=$BASE_URL|g" .env
-rm -f .env.bak
+cat <<EOF > .env
+# Server
+PORT=$SERVER_PORT
+NODE_ENV=development
+
+# MongoDB
+MONGODB_URI=$MONGODB_URI
+
+# Firebase (path to service account key JSON)
+FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account-key.json
+
+# Cloudinary (image/video uploads)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_xxxx
+STRIPE_PUBLISHABLE_KEY=pk_test_xxxx
+
+# Razorpay
+RAZORPAY_KEY_ID=rzp_test_xxxx
+RAZORPAY_KEY_SECRET=your_razorpay_secret
+
+# Agora
+AGORA_APP_ID=your_agora_app_id
+AGORA_APP_CERTIFICATE=your_agora_app_certificate
+
+# Admin Panel
+ADMIN_EMAIL=admin@tingle.com
+ADMIN_PASSWORD=admin123
+SESSION_SECRET=your_session_secret_change_this
+
+# App Config
+BASE_URL=$BASE_URL
+MAX_FILE_SIZE=50000000
+EOF
 
 echo "[+] Environment variables successfully injected."
 
