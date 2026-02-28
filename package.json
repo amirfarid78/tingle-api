@@ -1,7 +1,7 @@
 {
-  "name": "tingle-backend",
+  "name": "snaplive-backend",
   "version": "1.0.0",
-  "description": "Tingle Live Streaming App - Backend API Server",
+  "description": "Snap Live — Live Streaming App Backend API Server",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
