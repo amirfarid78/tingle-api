@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { auth } = require('../middleware/auth');
+const { upload, uploadToCloudinary } = require('../middleware/upload');
 const User = require('../models/User');
 
 // Helper: simple in-memory live session store (replace with DB model if needed)
@@ -76,19 +77,58 @@ router.get('/users', async (req, res, next) => {
         const liveUsers = await User.find({ isLive: true }).select(
             'name userName image uniqueId isVerified isVIP coin wealthLevel liveHistoryId'
         );
-        res.json({ status: true, data: liveUsers });
+
+        let result = [];
+        for (let user of liveUsers) {
+            let session = liveSessions.get(user.liveHistoryId) || {};
+            result.push({
+                _id: session._id || user._id,
+                userId: user._id,
+                name: user.name,
+                userName: user.userName,
+                image: user.image,
+                uniqueId: user.uniqueId,
+                isVerified: user.isVerified,
+                isVIP: user.isVIP,
+                coin: user.coin,
+                wealthLevelImage: user.wealthLevel,
+                liveHistoryId: user.liveHistoryId,
+                isFake: false, // explicitly set so Flutter doesn't use dummy data
+                view: session.viewerCount || 0,
+                channel: session.channel || '',
+                token: session.token || '', // host might not have token, but users might need it
+                liveType: session.liveType || 1, // 1 for video, 2 for audio
+                audioLiveType: session.audioLiveType || 0,
+                agoraUid: session.agoraUID || 0,
+                roomName: session.roomName || '',
+                roomWelcome: session.roomWelcome || '',
+                roomImage: session.roomImage || user.image,
+                privateCode: session.privateCode || 0,
+                bgTheme: session.bgTheme || ''
+            });
+        }
+
+        res.json({ status: true, data: result });
     } catch (error) {
         next(error);
     }
 });
 
 // POST /api/live/audio/create — Create an audio party room
-router.post('/audio/create', auth, async (req, res, next) => {
+router.post('/audio/create', auth, upload.single('roomImage'), async (req, res, next) => {
     try {
         const user = await User.findOne({ firebaseUid: req.uid });
         if (!user) return res.status(404).json({ status: false, message: 'User not found' });
 
         const { channel, liveType, agoraUID, audioLiveType, privateCode, roomName, roomWelcome, bgTheme } = req.body;
+
+        // Upload roomImage if present
+        let finalRoomImage = user.image || '';
+        if (req.file) {
+            finalRoomImage = await uploadToCloudinary(req.file.path, 'tingle/rooms');
+        } else if (req.body.roomImage) {
+            finalRoomImage = req.body.roomImage;
+        }
 
         // Generate an Agora token for this channel
         const { RtcRole, RtcTokenBuilder } = require('../utils/agoraToken');
@@ -121,7 +161,7 @@ router.post('/audio/create', auth, async (req, res, next) => {
             privateCode: privateCode || 0,
             roomName: roomName || `${user.name}'s Room`,
             roomWelcome: roomWelcome || 'Welcome!',
-            roomImage: req.body.roomImage || user.image || '',
+            roomImage: finalRoomImage,
             bgTheme: bgTheme || '',
             token: agoraToken,
             viewerCount: 0,
