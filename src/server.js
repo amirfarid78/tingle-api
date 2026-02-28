@@ -64,6 +64,7 @@ app.use('/api/search', require('./routes/search.routes'));
 app.use('/api/report', require('./routes/report.routes'));
 app.use('/api/help', require('./routes/help.routes'));
 app.use('/api/agora', require('./routes/agora.routes'));
+app.use('/api/live', require('./routes/live.routes'));
 
 // ─── Admin Routes ───────────────────────────────────────
 app.use('/admin', require('./routes/admin.routes'));
