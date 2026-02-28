@@ -124,11 +124,25 @@ router.post('/register-mobile', async (req, res, next) => {
             $or: [{ firebaseUid: uid }, { mobileNumber }]
         });
 
-        if (user) {
-            return res.status(400).json({ status: false, message: 'User already exists with this mobile number or UID' });
-        }
-
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        if (user) {
+            // User exists — update their password and tokens (re-registration / password update)
+            user.password = hashedPassword;
+            user.firebaseUid = uid;
+            user.fcmToken = fcmToken || user.fcmToken;
+            user.lastlogin = new Date();
+            user.isOnline = true;
+            if (name && !user.name) user.name = name;
+            await user.save();
+
+            return res.json({
+                status: true,
+                message: 'Account updated successfully',
+                signUp: false,
+                user: formatUserResponse(user, req)
+            });
+        }
 
         user = new User({
             name: name || '',

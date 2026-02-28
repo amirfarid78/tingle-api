@@ -2,8 +2,8 @@ const router = require('express').Router();
 const { auth } = require('../middleware/auth');
 const Setting = require('../models/Setting');
 
-// GET /api/settings — Fetch admin settings
-router.get('/', auth, async (req, res, next) => {
+// GET /api/settings — Fetch admin settings (public - called before login)
+router.get('/', async (req, res, next) => {
     try {
         let settings = await Setting.findOne({});
 
