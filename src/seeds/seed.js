@@ -108,11 +108,11 @@ async function seed() {
     // ─── Songs ────────────────────────────────────────
     if (await Song.countDocuments() === 0) {
         await Song.insertMany([
-            { songTitle: 'Summer Vibes', singerName: 'DJ Groove', duration: 30 },
-            { songTitle: 'Night Sky', singerName: 'Luna', duration: 25 },
-            { songTitle: 'Energy', singerName: 'Beat Master', duration: 30 },
-            { songTitle: 'Chill Wave', singerName: 'Ocean', duration: 20 },
-            { songTitle: 'Fire Dance', singerName: 'Blaze', duration: 30 },
+            { songTitle: 'Summer Vibes', singerName: 'DJ Groove', duration: 30, songLink: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', songImage: 'https://picsum.photos/200' },
+            { songTitle: 'Night Sky', singerName: 'Luna', duration: 25, songLink: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', songImage: 'https://picsum.photos/201' },
+            { songTitle: 'Energy', singerName: 'Beat Master', duration: 30, songLink: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', songImage: 'https://picsum.photos/202' },
+            { songTitle: 'Chill Wave', singerName: 'Ocean', duration: 20, songLink: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', songImage: 'https://picsum.photos/203' },
+            { songTitle: 'Fire Dance', singerName: 'Blaze', duration: 30, songLink: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', songImage: 'https://picsum.photos/204' },
         ]);
         console.log('✅ Songs created');
     }
