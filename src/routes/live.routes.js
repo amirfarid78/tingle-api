@@ -82,4 +82,69 @@ router.get('/users', async (req, res, next) => {
     }
 });
 
+// POST /api/live/audio/create — Create an audio party room
+router.post('/audio/create', auth, async (req, res, next) => {
+    try {
+        const user = await User.findOne({ firebaseUid: req.uid });
+        if (!user) return res.status(404).json({ status: false, message: 'User not found' });
+
+        const { channel, liveType, agoraUID, audioLiveType, privateCode, roomName, roomWelcome, bgTheme } = req.body;
+
+        // Generate an Agora token for this channel
+        const { RtcRole, RtcTokenBuilder } = require('../utils/agoraToken');
+        const appID = process.env.AGORA_APP_ID;
+        const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+        let agoraToken = '';
+        try {
+            const expirationTimeInSeconds = 3600;
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+            agoraToken = RtcTokenBuilder.buildTokenWithUid(
+                appID, appCertificate, channel || `audio_${Date.now()}`,
+                parseInt(agoraUID) || 0, RtcRole.PUBLISHER, privilegeExpiredTs
+            );
+        } catch (e) {
+            console.warn('Agora token generation failed, using fallback:', e.message);
+        }
+
+        const liveHistoryId = `audio_${user._id}_${Date.now()}`;
+        const roomData = {
+            _id: liveHistoryId,
+            hostId: user._id.toString(),
+            hostName: user.name,
+            hostImage: user.image,
+            hostUniqueId: user.uniqueId,
+            channel: channel || liveHistoryId,
+            agoraUID: parseInt(agoraUID) || 0,
+            liveType: liveType || 2,
+            audioLiveType: audioLiveType || 2,
+            privateCode: privateCode || 0,
+            roomName: roomName || `${user.name}'s Room`,
+            roomWelcome: roomWelcome || 'Welcome!',
+            roomImage: req.body.roomImage || user.image || '',
+            bgTheme: bgTheme || '',
+            token: agoraToken,
+            viewerCount: 0,
+            startedAt: new Date(),
+        };
+
+        liveSessions.set(liveHistoryId, roomData);
+
+        // Mark user as live
+        user.isLive = true;
+        user.liveHistoryId = liveHistoryId;
+        await user.save();
+
+        res.json({
+            status: true,
+            message: 'Audio room created successfully',
+            room: roomData,
+            liveHistoryId,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;
+
