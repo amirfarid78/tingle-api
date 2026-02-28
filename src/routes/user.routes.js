@@ -82,41 +82,60 @@ router.get('/profile/:userId', auth, async (req, res, next) => {
 });
 
 // PUT /api/user/profile/edit — Edit profile
-router.put('/profile/edit', auth, upload.single('image'), async (req, res, next) => {
-    try {
-        const user = await User.findOne({ firebaseUid: req.uid });
-        if (!user) return res.status(404).json({ status: false, message: 'User not found' });
+router.put('/profile/edit', auth, (req, res, next) => {
+    // Use upload middleware but don't fail if no file
+    upload.single('image')(req, res, async (uploadErr) => {
+        try {
+            if (uploadErr) {
+                console.error('Upload middleware error:', uploadErr.message);
+                // Continue anyway — the user might just be updating text fields
+            }
 
-        const { name, userName, bio, age, gender, country, countryFlagImage } = req.body;
+            const user = await User.findOne({ firebaseUid: req.uid });
+            if (!user) return res.status(404).json({ status: false, message: 'User not found' });
 
-        if (name !== undefined) user.name = name;
-        if (userName !== undefined) {
-            // Check uniqueness
-            const existing = await User.findOne({ userName, _id: { $ne: user._id } });
-            if (existing) return res.status(400).json({ status: false, message: 'Username already taken' });
-            user.userName = userName;
+            const { name, userName, bio, age, gender, country, countryFlagImage } = req.body;
+
+            if (name !== undefined && name.trim()) user.name = name.trim();
+            if (userName !== undefined && userName.trim()) {
+                const existing = await User.findOne({ userName: userName.trim(), _id: { $ne: user._id } });
+                if (existing) return res.status(400).json({ status: false, message: 'Username already taken' });
+                user.userName = userName.trim();
+            }
+            if (bio !== undefined) user.bio = bio;
+            if (age !== undefined) {
+                const parsedAge = parseInt(age);
+                if (!isNaN(parsedAge)) user.age = parsedAge;
+            }
+            if (gender !== undefined) user.gender = gender;
+            if (country !== undefined) user.country = country;
+            if (countryFlagImage !== undefined) user.countryFlagImage = countryFlagImage;
+
+            // Upload image only if one was provided and no upload error
+            if (req.file && !uploadErr) {
+                try {
+                    const imageUrl = await uploadToCloudinary(req.file.path, 'tingle/profiles');
+                    user.image = imageUrl;
+                } catch (imgErr) {
+                    console.warn('Image upload failed (non-fatal):', imgErr.message);
+                    // Keep existing image — don't fail the whole request
+                }
+            }
+
+            await user.save();
+
+            res.json({
+                status: true,
+                message: 'Profile updated successfully',
+                user: formatUserProfile(user),
+            });
+        } catch (error) {
+            console.error('Profile edit error:', error);
+            next(error);
         }
-        if (bio !== undefined) user.bio = bio;
-        if (age !== undefined) user.age = parseInt(age) || 0;
-        if (gender !== undefined) user.gender = gender;
-        if (country !== undefined) user.country = country;
-        if (countryFlagImage !== undefined) user.countryFlagImage = countryFlagImage;
-
-        if (req.file) {
-            user.image = await uploadToCloudinary(req.file.path, 'tingle/profiles');
-        }
-
-        await user.save();
-
-        res.json({
-            status: true,
-            message: 'Profile updated successfully',
-            user: formatUserProfile(user),
-        });
-    } catch (error) {
-        next(error);
-    }
+    });
 });
+
 
 // POST /api/user/fill-profile — Fill profile (onboarding)
 router.post('/fill-profile', auth, upload.single('image'), async (req, res, next) => {
