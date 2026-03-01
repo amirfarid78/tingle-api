@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { auth } = require('../middleware/auth');
 const { upload, uploadToCloudinary } = require('../middleware/upload');
+const { RtcRole, RtcTokenBuilder } = require('../utils/agoraToken');
 const User = require('../models/User');
 
 // Helper: simple in-memory live session store (replace with DB model if needed)
@@ -13,6 +14,24 @@ router.post('/start', auth, async (req, res, next) => {
         if (!user) return res.status(404).json({ status: false, message: 'User not found' });
 
         const { liveType, channel, agoraUID, roomName, roomWelcome, isPrivate, privateCode } = req.body;
+
+        // Generate Agora token for the video live stream
+        let agoraToken = '';
+        try {
+            const appId = process.env.AGORA_APP_ID;
+            const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+            if (appId && appCertificate && appId !== 'your_agora_app_id') {
+                const expirationTimeInSeconds = 3600;
+                const currentTimestamp = Math.floor(Date.now() / 1000);
+                const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+                agoraToken = RtcTokenBuilder.buildTokenWithUid(
+                    appId, appCertificate, channel || `live_${Date.now()}`,
+                    parseInt(agoraUID) || 0, RtcRole.PUBLISHER, privilegeExpiredTs
+                );
+            }
+        } catch (e) {
+            console.warn('Agora token generation failed in live/start:', e.message);
+        }
 
         const liveHistoryId = `live_${user._id}_${Date.now()}`;
 
@@ -29,6 +48,7 @@ router.post('/start', auth, async (req, res, next) => {
             roomWelcome: roomWelcome || 'Welcome to join the live.',
             isPrivate: isPrivate || false,
             privateCode: privateCode || '',
+            token: agoraToken,
             viewerCount: 0,
             startedAt: new Date(),
         });
@@ -43,6 +63,7 @@ router.post('/start', auth, async (req, res, next) => {
             message: 'Live session started',
             data: liveSessions.get(liveHistoryId),
             liveHistoryId,
+            token: agoraToken,
         });
     } catch (error) {
         next(error);
