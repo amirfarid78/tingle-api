@@ -9,9 +9,25 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ─── Use memory storage — NO local /uploads folder needed ───────────────────
-// Files are held as Buffer in req.file.buffer, then streamed to Cloudinary.
-const storage = multer.memoryStorage();
+const fs = require('fs');
+const path = require('path');
+
+// ─── Use disk storage to prevent OOM on large videos ─────────────────────────
+// Files are saved to a temporary folder and then streamed to Cloudinary, then deleted.
+const tempDir = path.join(__dirname, '../../temp_uploads');
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, tempDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+});
 
 const fileFilter = (req, file, cb) => {
     const allowedImage = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -31,50 +47,46 @@ const upload = multer({
     limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 100 * 1024 * 1024 } // 100MB
 });
 
-/**
- * Upload a buffer (from memoryStorage) directly to Cloudinary via stream.
- * No disk write needed — works on any VPS without an uploads directory.
- *
- * @param {Buffer} buffer     - File buffer from req.file.buffer
- * @param {string} folder     - Cloudinary folder (e.g. 'tingle/videos')
- * @param {string} resourceType - 'image' | 'video' | 'auto'
- * @returns {Promise<string>} - Cloudinary secure_url
- */
-const uploadBufferToCloudinary = (buffer, folder = 'tingle', resourceType = 'auto') => {
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            { folder, resource_type: resourceType },
-            (error, result) => {
-                if (error) return reject(error);
-                resolve(result.secure_url);
-            }
-        );
-        // Convert buffer → readable stream and pipe into cloudinary
-        const readable = new Readable();
-        readable.push(buffer);
-        readable.push(null);
-        readable.pipe(uploadStream);
-    });
-};
-
-/**
- * Backward-compatible wrapper: accepts either a file path (string) or
- * a Buffer so existing callers don't break.
- *
- * @param {string|Buffer} filePathOrBuffer
- * @param {string} folder
- * @param {string} resourceType
- */
+// Since we moved to diskStorage, we don't need uploadBufferToCloudinary anymore.
+// We will modify the standard uploadToCloudinary to accept the file path and delete it after.
 const uploadToCloudinary = async (filePathOrBuffer, folder = 'tingle', resourceType = 'auto') => {
     if (Buffer.isBuffer(filePathOrBuffer)) {
-        return uploadBufferToCloudinary(filePathOrBuffer, folder, resourceType);
+        // Fallback for any legacy memory buffer code
+        return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { folder, resource_type: resourceType },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result.secure_url);
+                }
+            );
+            const readable = new Readable();
+            readable.push(filePathOrBuffer);
+            readable.push(null);
+            readable.pipe(uploadStream);
+        });
     }
-    // Legacy: caller passed a local file path (fallback for any remaining usage)
-    const result = await cloudinary.uploader.upload(filePathOrBuffer, {
-        folder,
-        resource_type: resourceType,
-    });
-    return result.secure_url;
+
+    try {
+        // Normal disk upload
+        const result = await cloudinary.uploader.upload(filePathOrBuffer, {
+            folder,
+            resource_type: resourceType,
+        });
+
+        // Delete local temp file after success
+        if (fs.existsSync(filePathOrBuffer)) {
+            fs.unlinkSync(filePathOrBuffer);
+        }
+
+        return result.secure_url;
+    } catch (error) {
+        // Ensure cleanup even on error
+        if (fs.existsSync(filePathOrBuffer)) {
+            fs.unlinkSync(filePathOrBuffer);
+        }
+        throw error;
+    }
 };
 
 /**
@@ -91,4 +103,4 @@ const uploadMultipleToCloudinary = async (files, folder = 'tingle') => {
     return urls;
 };
 
-module.exports = { upload, uploadToCloudinary, uploadBufferToCloudinary, uploadMultipleToCloudinary, cloudinary };
+module.exports = { upload, uploadToCloudinary, uploadMultipleToCloudinary, cloudinary };
